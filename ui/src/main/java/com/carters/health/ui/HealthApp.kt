@@ -163,6 +163,13 @@ private fun HealthTab.icon(): ImageVector = when (this) {
     HealthTab.TRENDS -> Icons.Default.ShowChart
 }
 
+private fun HealthTab.accent(): Color = when (this) {
+    HealthTab.HOME -> HealthColors.GreenDeep
+    HealthTab.TRAIN -> HealthColors.Terracotta
+    HealthTab.SLEEP -> HealthColors.LavenderDeep
+    HealthTab.TRENDS -> HealthColors.Sky
+}
+
 /** Floating tab bar: flat off-white capsule, selected tab on a soft green pill. */
 @Composable
 fun FloatingTabBar(selected: HealthTab, liveWorkout: Boolean, onSelect: (HealthTab) -> Unit, modifier: Modifier = Modifier) {
@@ -180,8 +187,9 @@ fun FloatingTabBar(selected: HealthTab, liveWorkout: Boolean, onSelect: (HealthT
         HealthTab.entries.forEach { tab ->
             val on = tab == selected
             val scale by animateFloatAsState(if (on) 1f else 0.94f, Motion.softSpring, label = "tabScale")
-            val tint by animateColorAsState(if (on) HealthColors.GreenDeep else HealthColors.Muted, label = "tint")
-            val bg by animateColorAsState(if (on) HealthColors.GreenSoft else Color.Transparent, label = "tabBg")
+            val accent = tab.accent()
+            val tint by animateColorAsState(if (on) accent else HealthColors.Muted, label = "tint")
+            val bg by animateColorAsState(if (on) HealthColors.tint(accent) else Color.Transparent, label = "tabBg")
             val interaction = remember { MutableInteractionSource() }
             Column(
                 Modifier

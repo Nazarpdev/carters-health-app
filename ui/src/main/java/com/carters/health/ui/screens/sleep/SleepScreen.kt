@@ -143,23 +143,23 @@ private fun NavChevron(icon: androidx.compose.ui.graphics.vector.ImageVector, en
         Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(if (enabled) HealthColors.GreenSoft else HealthColors.CardAlt)
+            .background(if (enabled) HealthColors.LavenderSoft else HealthColors.CardAlt)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = null, tint = if (enabled) HealthColors.GreenDeep else HealthColors.Faint)
+        Icon(icon, contentDescription = null, tint = if (enabled) HealthColors.LavenderDeep else HealthColors.Faint)
     }
 }
 
 @Composable
 private fun SleepScoreCard(night: SleepNight) {
     val timeFmt = DateTimeFormatter.ofPattern("h:mm a")
-    SoftCard(accent = HealthColors.Sage, contentPadding = PaddingValues(20.dp)) {
+    SoftCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadialGauge(progress = night.score / 100f, modifier = Modifier.size(150.dp), colors = listOf(HealthColors.GreenDeep, HealthColors.Sage), strokeWidth = 12.dp) {
+            RadialGauge(progress = night.score / 100f, modifier = Modifier.size(150.dp), colors = listOf(HealthColors.Lavender), strokeWidth = 12.dp) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("${night.score}", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink, fontWeight = FontWeight.Bold)
-                    Eyebrow("Sleep score", HealthColors.Sage)
+                    Eyebrow("Sleep score", HealthColors.Lavender)
                 }
             }
             Spacer(Modifier.width(18.dp))
@@ -180,8 +180,8 @@ private fun SleepScoreCard(night: SleepNight) {
         }
         Spacer(Modifier.height(14.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill("Bed ${night.start.format(timeFmt)}", color = HealthColors.Sage, icon = Icons.Default.Bedtime)
-            Pill("Wake ${night.end.format(timeFmt)}", color = HealthColors.Green, icon = Icons.Default.WbSunny)
+            Pill("Bed ${night.start.format(timeFmt)}", color = HealthColors.Lavender, icon = Icons.Default.Bedtime)
+            Pill("Wake ${night.end.format(timeFmt)}", color = HealthColors.Ochre, icon = Icons.Default.WbSunny)
         }
     }
 }
@@ -193,8 +193,8 @@ private fun HypnogramCard(night: SleepNight) {
     val reveal by rememberRevealedProgress(1f, "hypno")
     val labelStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Muted, fontSize = 10.sp, fontWeight = FontWeight.Medium)
     val timeFmt = DateTimeFormatter.ofPattern("h a")
-    SoftCard(accent = HealthColors.GreenDeep, contentPadding = PaddingValues(16.dp)) {
-        Eyebrow("Hypnogram", HealthColors.Sage)
+    SoftCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(16.dp)) {
+        Eyebrow("Hypnogram", HealthColors.Lavender)
         Text("${night.segments.size} stage transitions · ${hm(night.timeInBedMinutes)} in bed", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
         Spacer(Modifier.height(10.dp))
         Canvas(Modifier.fillMaxWidth().height(170.dp)) {
@@ -273,14 +273,14 @@ private fun NightRow(night: SleepNight, selected: Boolean, onClick: () -> Unit) 
     val shape = RoundedCornerShape(14.dp)
     val accent = when {
         night.score >= 80 -> HealthColors.Green
-        night.score >= 60 -> HealthColors.Sage
+        night.score >= 60 -> HealthColors.Lavender
         else -> HealthColors.Terracotta
     }
     Row(
         Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(if (selected) HealthColors.GreenSoft else HealthColors.Card)
+            .background(if (selected) HealthColors.LavenderSoft else HealthColors.Card)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,

@@ -200,8 +200,8 @@ private fun ChronometerHeader(session: WorkoutSessionState, onFinish: () -> Unit
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Pill("${session.completedSets} ${if (session.completedSets == 1) "set" else "sets"}", color = HealthColors.Green)
-            Pill("${session.totalReps} reps", color = HealthColors.Green)
-            Pill("${Units.displayWeight(session.totalVolumeLbs, session.unit).format0()} ${session.unit.label}", color = HealthColors.Green)
+            Pill("${session.totalReps} reps", color = HealthColors.Lavender)
+            Pill("${Units.displayWeight(session.totalVolumeLbs, session.unit).format0()} ${session.unit.label}", color = HealthColors.Ochre)
         }
     }
 }
@@ -308,7 +308,7 @@ private fun ExerciseCard(session: WorkoutSessionState, ex: ExerciseState) {
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     Pill(ex.exercise.muscleGroup.label, color = HealthColors.Green)
                     Pill(ex.exercise.equipment.label, color = HealthColors.Muted)
-                    Pill("rest ${ex.exercise.defaultRestSeconds}s", color = HealthColors.Green)
+                    Pill("rest ${ex.exercise.defaultRestSeconds}s", color = HealthColors.Sky)
                 }
             }
             Box {
@@ -436,7 +436,7 @@ private fun SetRow(
             onValueChange = { t -> rpeText = t; set.rpe = t.toDoubleOrNull()?.coerceIn(1.0, 10.0) },
             modifier = Modifier.weight(COL_RPE).padding(horizontal = 3.dp),
             placeholder = "RPE",
-            accent = HealthColors.Sage,
+            accent = HealthColors.Lavender,
             enabled = !set.completed,
         )
         Box(Modifier.weight(COL_DONE), contentAlignment = Alignment.Center) {
@@ -577,13 +577,13 @@ fun ExerciseListRow(ex: Exercise, trailing: (@Composable () -> Unit)? = null, on
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(ex.name, style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
-                if (ex.isCustom) { Spacer(Modifier.width(6.dp)); Pill("Custom", color = HealthColors.Sage, filled = true) }
+                if (ex.isCustom) { Spacer(Modifier.width(6.dp)); Pill("Custom", color = HealthColors.Lavender) }
             }
             Spacer(Modifier.height(4.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 Pill(ex.muscleGroup.label, color = HealthColors.Green)
                 Pill(ex.equipment.label, color = HealthColors.Muted)
-                Pill("${ex.defaultRestSeconds}s rest", color = HealthColors.Green)
+                Pill("${ex.defaultRestSeconds}s rest", color = HealthColors.Sky)
             }
         }
         if (trailing != null) trailing() else Icon(Icons.Default.Add, contentDescription = null, tint = HealthColors.Green)

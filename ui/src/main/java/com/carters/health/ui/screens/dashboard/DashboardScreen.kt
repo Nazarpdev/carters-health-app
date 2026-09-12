@@ -78,10 +78,10 @@ internal fun greetingFor(hour: Int, readiness: Int, strain: Double): Greeting {
         else -> "keep today light — your body is still rebuilding"
     }
     return when (hour) {
-        in 5..11 -> Greeting("Good morning", "$recoveryLine.", HealthColors.Green)
+        in 5..11 -> Greeting("Good morning", "$recoveryLine.", HealthColors.Ochre)
         in 12..16 -> Greeting("Good afternoon", if (strain < 8) "plenty of room left for strain today." else "$recoveryLine.", HealthColors.Green)
         in 17..20 -> Greeting("Good evening", if (strain >= 14) "big day — start winding down." else "$recoveryLine.", HealthColors.Terracotta)
-        else -> Greeting("Rest & recharge tonight", "dim the lights — deep sleep builds tomorrow's readiness.", HealthColors.Sage)
+        else -> Greeting("Rest & recharge tonight", "dim the lights — deep sleep builds tomorrow's readiness.", HealthColors.Lavender)
     }
 }
 
@@ -147,7 +147,7 @@ fun DashboardScreen(
                     BaselineCard("Resting HR", rhr.current, "bpm", rhr.sevenDayAverage, lowerIsBetter = true, accent = HealthColors.Terracotta)
                 }
                 item {
-                    BaselineCard("HRV", hrv.current, "ms", hrv.sevenDayAverage, lowerIsBetter = false, accent = HealthColors.Green)
+                    BaselineCard("HRV", hrv.current, "ms", hrv.sevenDayAverage, lowerIsBetter = false, accent = HealthColors.Sky)
                 }
             }
         }
@@ -172,16 +172,16 @@ fun DashboardScreen(
 /** Calories: active burn ring over total, warm amber. */
 @Composable
 private fun BurnTile(active: Int, total: Int, modifier: Modifier = Modifier) {
-    SoftCard(modifier = modifier, accent = HealthColors.Green, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(modifier = modifier, accent = HealthColors.Ochre, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = HealthColors.Ochre, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Burn")
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadialGauge(progress = active / total.toFloat().coerceAtLeast(1f), modifier = Modifier.size(58.dp), colors = listOf(HealthColors.Green, HealthColors.Green), strokeWidth = 6.dp) {
-                Text("${(active * 100 / total.coerceAtLeast(1))}%", style = MaterialTheme.typography.labelSmall, color = HealthColors.Green)
+            RadialGauge(progress = active / total.toFloat().coerceAtLeast(1f), modifier = Modifier.size(58.dp), colors = listOf(HealthColors.Ochre), strokeWidth = 6.dp) {
+                Text("${(active * 100 / total.coerceAtLeast(1))}%", style = MaterialTheme.typography.labelSmall, color = HealthColors.Ochre)
             }
             Spacer(Modifier.width(10.dp))
             Column {
@@ -203,9 +203,9 @@ private fun WindDownTile(hour: Int, lastSleepMinutes: Int, modifier: Modifier = 
         debt > 60 -> "Repay ${debt / 60}h ${debt % 60}m of sleep debt tonight."
         else -> "Rhythm is steady. Keep the routine."
     }
-    SoftCard(modifier = modifier, accent = HealthColors.Sage, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(modifier = modifier, accent = HealthColors.Lavender, tinted = true, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Bedtime, contentDescription = null, tint = HealthColors.Sage, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Bedtime, contentDescription = null, tint = HealthColors.Lavender, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Wind-down")
         }
@@ -213,7 +213,7 @@ private fun WindDownTile(hour: Int, lastSleepMinutes: Int, modifier: Modifier = 
         Text(bedtime, style = MaterialTheme.typography.titleLarge, color = HealthColors.Ink)
         Text("target bedtime", style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
         Spacer(Modifier.height(6.dp))
-        Text(copy, style = MaterialTheme.typography.bodySmall, color = HealthColors.Sage)
+        Text(copy, style = MaterialTheme.typography.bodySmall, color = HealthColors.LavenderDeep)
     }
 }
 
@@ -268,7 +268,7 @@ private fun PillarDialCard(readiness: com.carters.health.data.model.ReadinessSna
                 rings = listOf(
                     DialRing(readiness.readinessPercent / 100f, listOf(HealthColors.GreenDeep), "Readiness"),
                     DialRing((readiness.strain / 21.0).toFloat(), listOf(HealthColors.Terracotta), "Strain"),
-                    DialRing(readiness.sleepPerformancePercent / 100f, listOf(HealthColors.Sage), "Sleep"),
+                    DialRing(readiness.sleepPerformancePercent / 100f, listOf(HealthColors.Lavender), "Sleep"),
                 ),
                 modifier = Modifier.size(172.dp),
                 strokeWidth = 11.dp,
@@ -283,7 +283,7 @@ private fun PillarDialCard(readiness: com.carters.health.data.model.ReadinessSna
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 PillarRow(HealthColors.GreenDeep, "Recovery", "${readiness.readinessPercent}%", "HRV ${readiness.hrvMs} ms")
                 PillarRow(HealthColors.Terracotta, "Strain", String.format("%.1f", readiness.strain), "of 21.0")
-                PillarRow(HealthColors.Sage, "Sleep", "${readiness.sleepPerformancePercent}%", "${sleepH}h ${sleepM}m rest")
+                PillarRow(HealthColors.Lavender, "Sleep", "${readiness.sleepPerformancePercent}%", "${sleepH}h ${sleepM}m rest")
             }
         }
     }
@@ -332,14 +332,14 @@ private fun LiveBiometricsStrip(bpm: Int, sparkline: List<Float>, modifier: Modi
             SpotCheckButton(
                 label = if (spotCheck == "spo2") "Measuring…" else "Spot SpO₂",
                 icon = Icons.Default.Bloodtype,
-                accent = HealthColors.Green,
+                accent = HealthColors.Sky,
                 active = spotCheck == "spo2",
                 modifier = Modifier.weight(1f),
             ) { haptics.confirm(); spotCheck = "spo2" }
             SpotCheckButton(
                 label = if (spotCheck == "stress") "Measuring…" else "Spot Stress",
                 icon = Icons.Default.Psychology,
-                accent = HealthColors.Sage,
+                accent = HealthColors.Lavender,
                 active = spotCheck == "stress",
                 modifier = Modifier.weight(1f),
             ) { haptics.confirm(); spotCheck = "stress" }
@@ -367,9 +367,9 @@ private fun SpotCheckButton(label: String, icon: androidx.compose.ui.graphics.ve
 
 @Composable
 private fun WeightCard(weightLbs: Double, delta: Double, source: String, recent: List<Float>, onClick: () -> Unit) {
-    SoftCard(modifier = Modifier.width(210.dp), accent = HealthColors.Green, contentPadding = PaddingValues(16.dp), onClick = onClick) {
+    SoftCard(modifier = Modifier.width(210.dp), accent = HealthColors.Sky, contentPadding = PaddingValues(16.dp), onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Sky, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Body weight")
         }
@@ -382,23 +382,23 @@ private fun WeightCard(weightLbs: Double, delta: Double, source: String, recent:
         Spacer(Modifier.height(6.dp))
         DeltaBadge(delta, "lbs", lowerIsBetter = true, suffix = " · 30D")
         Spacer(Modifier.height(10.dp))
-        Sparkline(recent, Modifier.fillMaxWidth().height(34.dp), color = HealthColors.Green, showEndDot = false)
+        Sparkline(recent, Modifier.fillMaxWidth().height(34.dp), color = HealthColors.Sky, showEndDot = false)
         Spacer(Modifier.height(8.dp))
-        Pill(source, color = HealthColors.Green)
+        Pill(source, color = HealthColors.Sky)
     }
 }
 
 @Composable
 private fun StepsCard(steps: Int, goal: Int, km: Double, activeKcal: Int) {
-    SoftCard(modifier = Modifier.width(236.dp), accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(modifier = Modifier.width(236.dp), accent = HealthColors.Ochre, contentPadding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.DirectionsWalk, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.DirectionsWalk, contentDescription = null, tint = HealthColors.Ochre, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Daily steps")
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            SegmentedRing(progress = steps / goal.toFloat(), modifier = Modifier.size(78.dp), strokeWidth = 7.dp) {
+            SegmentedRing(progress = steps / goal.toFloat(), modifier = Modifier.size(78.dp), strokeWidth = 7.dp, colors = listOf(HealthColors.Ochre)) {
                 Text("${(steps * 100 / goal)}%", style = MaterialTheme.typography.labelLarge, color = HealthColors.Ink)
             }
             Spacer(Modifier.width(12.dp))
@@ -406,7 +406,7 @@ private fun StepsCard(steps: Int, goal: Int, km: Double, activeKcal: Int) {
                 Text(steps.toDouble().format0(), style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
                 Text("of ${goal.toDouble().format0()}", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                 Spacer(Modifier.height(6.dp))
-                Text(String.format("%.1f km · %d kcal", km, activeKcal), style = MaterialTheme.typography.labelMedium, color = HealthColors.Green)
+                Text(String.format("%.1f km · %d kcal", km, activeKcal), style = MaterialTheme.typography.labelMedium, color = HealthColors.Ochre)
             }
         }
     }

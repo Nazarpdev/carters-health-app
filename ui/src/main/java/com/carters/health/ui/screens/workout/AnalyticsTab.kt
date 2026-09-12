@@ -73,7 +73,7 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
     ) {
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatTile("Volume", compactVolume(Units.displayWeight(totals.totalVolumeLbs, unit)), unit = unit.label, accent = HealthColors.Green, tinted = true, compact = true, modifier = Modifier.weight(1f))
+                StatTile("Volume", compactVolume(Units.displayWeight(totals.totalVolumeLbs, unit)), unit = unit.label, accent = HealthColors.Ochre, tinted = true, compact = true, modifier = Modifier.weight(1f))
                 StatTile("Workouts", totals.totalWorkouts.toString(), accent = HealthColors.Green, compact = true, modifier = Modifier.weight(1f))
                 StatTile("Sets", totals.totalSets.toDouble().format0(), accent = HealthColors.Terracotta, compact = true, modifier = Modifier.weight(1f))
             }
@@ -101,9 +101,9 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
                 SectionHeader("All-time PRs", subtitle = selected?.name ?: "")
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    PrCard("Max weight", formatWeight(maxW, unit), unit.label, HealthColors.Green, Modifier.weight(1f))
-                    PrCard("Max est. 1RM", formatWeight(max1rm, unit), unit.label, HealthColors.Green, Modifier.weight(1f))
-                    PrCard("Max volume set", Units.displayWeight(maxVol, unit).format0(), unit.label, HealthColors.Green, Modifier.weight(1f))
+                    PrCard("Max weight", formatWeight(maxW, unit), unit.label, HealthColors.Ochre, Modifier.weight(1f))
+                    PrCard("Max est. 1RM", formatWeight(max1rm, unit), unit.label, HealthColors.Ochre, Modifier.weight(1f))
+                    PrCard("Max volume set", Units.displayWeight(maxVol, unit).format0(), unit.label, HealthColors.Ochre, Modifier.weight(1f))
                 }
             }
         }
@@ -135,13 +135,13 @@ private fun OverloadChartCard(exercise: Exercise?, curve: List<com.carters.healt
             }
             LegendDot(HealthColors.Green, "Est. 1RM")
             Spacer(Modifier.width(10.dp))
-            LegendDot(HealthColors.Sage, "Heaviest")
+            LegendDot(HealthColors.Sky, "Heaviest")
         }
         Spacer(Modifier.height(8.dp))
         ScrubbableLineChart(
             series = listOf(
                 ChartSeries(curve.map { Units.displayWeight(it.estimatedOneRepMax, unit).toFloat() }, HealthColors.Green, label = "Est. 1RM"),
-                ChartSeries(curve.map { Units.displayWeight(it.heaviestSetLbs, unit).toFloat() }, HealthColors.Sage, fill = false, dashed = true, label = "Heaviest"),
+                ChartSeries(curve.map { Units.displayWeight(it.heaviestSetLbs, unit).toFloat() }, HealthColors.Sky, fill = false, dashed = true, label = "Heaviest"),
             ),
             modifier = Modifier.fillMaxWidth().height(230.dp),
             xLabel = { i -> curve.getOrNull(i)?.date?.format(fmt) ?: "" },
@@ -183,7 +183,7 @@ private fun HistoryCard(entry: WorkoutHistoryEntry, unit: WeightUnit) {
                 Text(entry.name, style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
                 Text("${entry.date.format(DateTimeFormatter.ofPattern("EEE, MMM d"))} · ${entry.durationMinutes} min", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             }
-            if (entry.prCount > 0) Pill("${entry.prCount} PR", color = HealthColors.Green, icon = Icons.Default.EmojiEvents)
+            if (entry.prCount > 0) Pill("${entry.prCount} PR", color = HealthColors.Ochre, icon = Icons.Default.EmojiEvents)
         }
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {

@@ -123,7 +123,7 @@ fun WeightTrendScreen(
                     Text("Weight & body", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
                     Text("Fitbit Aria + BLE scale, unified", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                 }
-                UnitToggle(unit, { unit = it })
+                UnitToggle(unit, { unit = it }, accent = HealthColors.Sky)
             }
         }
         item {
@@ -133,18 +133,18 @@ fun WeightTrendScreen(
             SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Eyebrow("Trend", HealthColors.Green)
+                        Eyebrow("Trend", HealthColors.Sky)
                         Text("${window.size} weigh-ins", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                     }
                     SegmentedControl(
                         Timeframe.entries.map { it.label }, timeframe.ordinal, { haptics.tick(); timeframe = Timeframe.entries[it] },
-                        Modifier.width(200.dp), accent = HealthColors.Green, height = 32.dp,
+                        Modifier.width(200.dp), accent = HealthColors.Sky, height = 32.dp,
                     )
                 }
                 Spacer(Modifier.height(8.dp))
                 val fmt = if (timeframe == Timeframe.D7) DateTimeFormatter.ofPattern("EEE") else DateTimeFormatter.ofPattern("MMM d")
                 ScrubbableLineChart(
-                    series = listOf(ChartSeries(window.map { Units.displayWeight(it.weightLbs, unit).toFloat() }, HealthColors.Green, listOf(HealthColors.Green, HealthColors.Green))),
+                    series = listOf(ChartSeries(window.map { Units.displayWeight(it.weightLbs, unit).toFloat() }, HealthColors.Sky)),
                     modifier = Modifier.fillMaxWidth().height(230.dp),
                     baseline = Units.displayWeight(baseline30, unit).toFloat(),
                     xLabel = { i -> window.getOrNull(i)?.time?.format(fmt) ?: "" },
@@ -161,12 +161,12 @@ fun WeightTrendScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        CompositionTile("Body fat", String.format("%.1f", composition.bodyFatPercent), "%", composition.bodyFatCategory, HealthColors.Green, Modifier.weight(1f))
+                        CompositionTile("Body fat", String.format("%.1f", composition.bodyFatPercent), "%", composition.bodyFatCategory, HealthColors.Ochre, Modifier.weight(1f))
                         CompositionTile("BMI", String.format("%.1f", composition.bmi), "", composition.bmiCategory, HealthColors.Green, Modifier.weight(1f))
                     }
                     CompositionTile(
                         "Lean body mass", String.format("%.1f", Units.displayWeight(composition.leanMassLbs, unit)), unit.label,
-                        "muscle · bone · water", HealthColors.Sage, Modifier.fillMaxWidth(),
+                        "muscle · bone · water", HealthColors.Sky, Modifier.fillMaxWidth(),
                         support = "${String.format("%.1f", 100 - composition.bodyFatPercent)}% of body weight is lean tissue",
                     )
                 }
@@ -177,7 +177,7 @@ fun WeightTrendScreen(
             ScaleSyncCard(scanning) { haptics.confirm(); scanning = true }
         }
         item {
-            PrimaryButton("Log Weight", icon = Icons.Default.Add, color = HealthColors.Green, modifier = Modifier.fillMaxWidth()) { showLog = true }
+            PrimaryButton("Log Weight", icon = Icons.Default.Add, color = HealthColors.Sky, modifier = Modifier.fillMaxWidth()) { showLog = true }
         }
         item { SectionHeader("Weigh-in history", subtitle = "${sorted.size} entries") }
         items(sorted.asReversed().take(30).size, key = { sorted.asReversed()[it].id }) { i ->
@@ -198,11 +198,11 @@ fun WeightTrendScreen(
 
 @Composable
 private fun HeroWeightCard(latest: WeightEntry?, unit: WeightUnit, delta: Double, fmt: DateTimeFormatter) {
-    SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(22.dp)) {
+    SoftCard(accent = HealthColors.Sky, contentPadding = PaddingValues(22.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Sky, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
-            Eyebrow("Current weight", HealthColors.Green)
+            Eyebrow("Current weight", HealthColors.Sky)
         }
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.Bottom) {
@@ -216,7 +216,7 @@ private fun HeroWeightCard(latest: WeightEntry?, unit: WeightUnit, delta: Double
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DeltaBadge(Units.displayWeight(delta, unit), unit.label, lowerIsBetter = true, suffix = " vs 30D")
-            if (latest != null) Pill(latest.source.label, color = HealthColors.Green)
+            if (latest != null) Pill(latest.source.label, color = HealthColors.Sky)
         }
         Spacer(Modifier.height(10.dp))
         Text(
@@ -307,7 +307,7 @@ private fun HistoryRow(entry: WeightEntry, previous: WeightEntry?, unit: WeightU
             Text(entry.time.format(DateTimeFormatter.ofPattern("EEE, MMM d · h:mm a")), style = MaterialTheme.typography.titleSmall, color = HealthColors.InkSoft)
             Spacer(Modifier.height(4.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Pill(entry.source.label, color = if (entry.source == WeightSource.MANUAL) HealthColors.Muted else HealthColors.Green)
+                Pill(entry.source.label, color = if (entry.source == WeightSource.MANUAL) HealthColors.Muted else HealthColors.Sky)
                 entry.bodyFatPercent?.let { Pill(String.format("%.1f%% fat", it), color = HealthColors.Muted) }
             }
         }
@@ -326,7 +326,7 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
     var weight by remember { mutableStateOf("") }
     var fat by remember { mutableStateOf("") }
     Dialog(onDismissRequest = onDismiss) {
-        SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(20.dp)) {
+        SoftCard(accent = HealthColors.Sky, contentPadding = PaddingValues(20.dp)) {
             Text("Manual weigh-in", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             Text(LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMM d · h:mm a")), style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             Spacer(Modifier.height(16.dp))
@@ -334,19 +334,19 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
                 Column(Modifier.weight(1f)) {
                     Eyebrow("Weight (${unit.label})")
                     Spacer(Modifier.height(6.dp))
-                    NumberField(weight, { weight = it }, Modifier.fillMaxWidth(), placeholder = "0.0")
+                    NumberField(weight, { weight = it }, Modifier.fillMaxWidth(), placeholder = "0.0", accent = HealthColors.Sky)
                 }
                 Column(Modifier.weight(1f)) {
                     Eyebrow("Body fat %")
                     Spacer(Modifier.height(6.dp))
-                    NumberField(fat, { fat = it }, Modifier.fillMaxWidth(), placeholder = "optional", accent = HealthColors.Terracotta)
+                    NumberField(fat, { fat = it }, Modifier.fillMaxWidth(), placeholder = "optional", accent = HealthColors.Ochre)
                 }
             }
             Spacer(Modifier.height(18.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text("Cancel", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.clickable(onClick = onDismiss).padding(8.dp))
                 Spacer(Modifier.width(8.dp))
-                PrimaryButton("Save", modifier = Modifier.weight(1f), height = 46.dp) {
+                PrimaryButton("Save", color = HealthColors.Sky, modifier = Modifier.weight(1f), height = 46.dp) {
                     val w = weight.toDoubleOrNull() ?: return@PrimaryButton
                     onSave(Units.toLbs(w, unit), fat.toDoubleOrNull())
                 }

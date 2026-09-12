@@ -31,17 +31,29 @@ object HealthColors {
     val Terracotta = Color(0xFFC4735A)
     val TerracottaSoft = Color(0xFFF2DED4)
 
+    // Pastel companions, each with a meaning
+    val Sky = Color(0xFF6C8EA6)          // weight, HRV, blood oxygen
+    val SkySoft = Color(0xFFDCE6EC)
+    val Lavender = Color(0xFF8B7CA6)     // sleep, wind-down, stress
+    val LavenderDeep = Color(0xFF6A5C86)
+    val LavenderSoft = Color(0xFFE6E1EE)
+    val Ochre = Color(0xFFC59B4E)        // energy, steps, calories, records
+    val OchreSoft = Color(0xFFF3E7CC)
+
     // Sleep stages
-    val StageDeep = GreenDeep
-    val StageRem = Sage
-    val StageLight = Color(0xFFC9D8C5)
-    val StageAwake = Color(0xFFDDA98F)
+    val StageDeep = LavenderDeep
+    val StageRem = Lavender
+    val StageLight = Color(0xFFCFD9E3)
+    val StageAwake = Color(0xFFE2B48F)
 
     /** Soft tonal tint of an accent for chips and badges. */
     fun tint(color: Color): Color = when (color) {
         Green, GreenDeep -> GreenSoft
         Terracotta -> TerracottaSoft
         Sage -> Color(0xFFE3ECE0)
+        Sky -> SkySoft
+        Lavender, LavenderDeep -> LavenderSoft
+        Ochre -> OchreSoft
         else -> CardAlt
     }
 }

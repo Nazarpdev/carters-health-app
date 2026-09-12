@@ -115,51 +115,51 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 BaselineTile("Resting HR", rhr.current, "bpm", rhr.sevenDayAverage, true, HealthColors.Terracotta, hrDay.filter { it.bpm < 70 }.takeLast(40).map { it.bpm.toFloat() }, Modifier.weight(1f))
-                BaselineTile("HRV", hrv.current, "ms", hrv.sevenDayAverage, false, HealthColors.Green, listOf(52f, 55f, 51f, 58f, 60f, 57f, 62f), Modifier.weight(1f))
+                BaselineTile("HRV", hrv.current, "ms", hrv.sevenDayAverage, false, HealthColors.Sky, listOf(52f, 55f, 51f, 58f, 60f, 57f, 62f), Modifier.weight(1f))
             }
         }
         item { SectionHeader("Blood oxygen", subtitle = "Spot checks + overnight SpO₂") }
         item {
             val zones = remember(spo2) {
                 listOf(
-                    spo2.count { it.percent >= 98 }.toFloat() to HealthColors.GreenDeep,
-                    spo2.count { it.percent in 95..97 }.toFloat() to HealthColors.Sage,
-                    spo2.count { it.percent in 90..94 }.toFloat() to HealthColors.StageLight,
+                    spo2.count { it.percent >= 98 }.toFloat() to HealthColors.Sky,
+                    spo2.count { it.percent in 95..97 }.toFloat() to HealthColors.StageLight,
+                    spo2.count { it.percent in 90..94 }.toFloat() to HealthColors.Ochre,
                     spo2.count { it.percent < 90 }.toFloat() to HealthColors.Terracotta,
                 )
             }
-            SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
+            SoftCard(accent = HealthColors.Sky, contentPadding = PaddingValues(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Bloodtype, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Bloodtype, contentDescription = null, tint = HealthColors.Sky, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Eyebrow("SpO₂ range", HealthColors.Green)
+                    Eyebrow("SpO₂ range", HealthColors.Sky)
                     Spacer(Modifier.weight(1f))
                     Text("avg ${String.format("%.1f", spo2.map { it.percent }.average())}%", style = MaterialTheme.typography.labelMedium, color = HealthColors.InkSoft)
                 }
                 Spacer(Modifier.height(10.dp))
                 BarStrip(
                     spo2.map { it.percent.toFloat() - 88f }, Modifier.fillMaxWidth().height(70.dp),
-                    colorFor = { v -> if (v + 88 >= 98) HealthColors.GreenDeep else if (v + 88 >= 95) HealthColors.Sage else HealthColors.StageLight },
+                    colorFor = { v -> if (v + 88 >= 98) HealthColors.Sky else if (v + 88 >= 95) HealthColors.StageLight else HealthColors.Ochre },
                     maxValue = 12f,
                 )
                 Spacer(Modifier.height(10.dp))
                 DistributionBar(zones, height = 8.dp)
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Pill("98–100 optimal", color = HealthColors.GreenDeep)
-                    Pill("95–97 normal", color = HealthColors.Sage)
-                    Pill("<95 low", color = HealthColors.Muted)
+                    Pill("98–100 optimal", color = HealthColors.Sky)
+                    Pill("95–97 normal", color = HealthColors.Muted)
+                    Pill("<95 low", color = HealthColors.Ochre)
                 }
             }
         }
         item { SectionHeader("Stress", subtitle = "Zepp stress index across the day") }
         item {
             val z = remember(stress) { SampleData.stressZones(stress) }
-            SoftCard(accent = HealthColors.Sage, contentPadding = PaddingValues(16.dp)) {
+            SoftCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Psychology, contentDescription = null, tint = HealthColors.Sage, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Psychology, contentDescription = null, tint = HealthColors.Lavender, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Eyebrow("Stress zones", HealthColors.Sage)
+                    Eyebrow("Stress zones", HealthColors.Lavender)
                     Spacer(Modifier.weight(1f))
                     Text("now ${stress.lastOrNull()?.level ?: 0}", style = MaterialTheme.typography.labelMedium, color = HealthColors.InkSoft)
                 }
@@ -171,14 +171,14 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
                 )
                 Spacer(Modifier.height(12.dp))
                 DistributionBar(
-                    listOf(z.relaxed.toFloat() to HealthColors.GreenDeep, z.normal.toFloat() to HealthColors.Sage, z.medium.toFloat() to HealthColors.StageLight, z.high.toFloat() to HealthColors.Terracotta),
+                    listOf(z.relaxed.toFloat() to HealthColors.LavenderDeep, z.normal.toFloat() to HealthColors.Lavender, z.medium.toFloat() to HealthColors.Ochre, z.high.toFloat() to HealthColors.Terracotta),
                     height = 8.dp,
                 )
                 Spacer(Modifier.height(10.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    ZoneStat("Relaxed", z.relaxed, HealthColors.GreenDeep)
-                    ZoneStat("Normal", z.normal, HealthColors.Sage)
-                    ZoneStat("Medium", z.medium, HealthColors.StageLight)
+                    ZoneStat("Relaxed", z.relaxed, HealthColors.LavenderDeep)
+                    ZoneStat("Normal", z.normal, HealthColors.Lavender)
+                    ZoneStat("Medium", z.medium, HealthColors.Ochre)
                     ZoneStat("High", z.high, HealthColors.Terracotta)
                 }
             }
@@ -187,9 +187,9 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
 }
 
 private fun stressColor(v: Float): Color = when {
-    v < 25 -> HealthColors.GreenDeep
-    v < 50 -> HealthColors.Sage
-    v < 75 -> HealthColors.StageLight
+    v < 25 -> HealthColors.LavenderDeep
+    v < 50 -> HealthColors.Lavender
+    v < 75 -> HealthColors.Ochre
     else -> HealthColors.Terracotta
 }
 

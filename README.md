@@ -2,8 +2,10 @@
 
 A warm, data-dense Android health tracker built with Jetpack Compose. The interface pairs the
 density of Zepp / Whoop with a calm, friendly aesthetic: an off-white canvas, flat beige and
-off-grey cards with no borders or gradients, a single sage-green accent (terracotta reserved for
-heart rate and effort), and two typefaces only: Instrument Serif for headlines and hero numbers,
+off-grey cards with no borders or gradients, and a small pastel family assigned by meaning:
+sage green for recovery and training, terracotta for heart rate and effort, dusty sky for weight,
+HRV and blood oxygen, soft lavender for sleep and stress, warm ochre for energy, steps and records.
+Two typefaces only: Instrument Serif for headlines and hero numbers,
 Nunito for everything else. Fonts are bundled under `ui/src/main/res/font` (SIL OFL).
 
 ## Modules
