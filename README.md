@@ -5,6 +5,7 @@ density of Zepp / Whoop with a calm, friendly aesthetic: an off-white canvas, fl
 off-grey cards with no borders or gradients, and a small pastel family assigned by meaning:
 sage green for recovery and training, terracotta for heart rate and effort, dusty sky for weight,
 HRV and blood oxygen, soft lavender for sleep and stress, warm ochre for energy, steps and records.
+The palette has a light and a dark mood (warm charcoal) and follows the system setting.
 Two typefaces only: Instrument Serif for headlines and hero numbers,
 Nunito for everything else. Fonts are bundled under `ui/src/main/res/font` (SIL OFL).
 
