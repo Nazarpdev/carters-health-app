@@ -88,15 +88,12 @@ fun SleepScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Column {
-                Text("Sleep", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
-                Text("Rest & recharge tonight — deep sleep builds tomorrow's readiness.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
-            }
+            Text("Sleep", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
         }
         item {
             DateNavigator(
                 label = night?.date?.format(dateFmt) ?: "No data",
-                sub = if (night != null) "${night.sourceRecordCount} records merged · Sleep as Android" else "",
+                sub = if (night != null) "${night.sourceRecordCount} records merged" else "",
                 canPrev = index < nights.lastIndex,
                 canNext = index > 0,
                 onPrev = { haptics.tick(); index++ },
@@ -118,7 +115,7 @@ fun SleepScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
                 }
             }
         }
-        item { SectionHeader("Recent nights", subtitle = "Tap to revisit") }
+        item { SectionHeader("Recent nights") }
         items(nights.size, key = { nights[it].date.toString() }) { i ->
             NightRow(nights[i], selected = i == index) { haptics.tick(); index = i }
         }
@@ -195,7 +192,6 @@ private fun HypnogramCard(night: SleepNight) {
     val timeFmt = DateTimeFormatter.ofPattern("h a")
     SoftCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(16.dp)) {
         Eyebrow("Hypnogram", HealthColors.Lavender)
-        Text("${night.segments.size} stage transitions · ${hm(night.timeInBedMinutes)} in bed", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
         Spacer(Modifier.height(10.dp))
         Canvas(Modifier.fillMaxWidth().height(170.dp)) {
             val leftPad = 44.dp.toPx()

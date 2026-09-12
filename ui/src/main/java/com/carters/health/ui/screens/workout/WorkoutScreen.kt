@@ -57,10 +57,7 @@ fun WorkoutScreen(
 
     Column(modifier.fillMaxSize().background(HealthColors.Canvas)) {
         Row(Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Text("Strength Studio", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
-                Text("Progressive overload, tracked to the rep.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
-            }
+            Text("Strength Studio", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink, modifier = Modifier.weight(1f))
             UnitToggle(session.unit, { session.unit = it })
         }
         Spacer(Modifier.height(12.dp))

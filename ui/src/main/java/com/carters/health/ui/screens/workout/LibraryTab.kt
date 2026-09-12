@@ -74,7 +74,7 @@ fun LibraryTab(repository: HealthRepository, onAddToWorkout: (Exercise) -> Unit,
         }
         grouped.forEach { (g, list) ->
             item(key = "header-${g.name}") {
-                SectionHeader(g.label, subtitle = "${list.size} exercises", modifier = Modifier.padding(top = 8.dp))
+                SectionHeader(g.label, modifier = Modifier.padding(top = 8.dp))
             }
             items(list, key = { it.id }) { ex ->
                 ExerciseListRow(ex, trailing = { Icon(Icons.Default.ChevronRight, contentDescription = null, tint = HealthColors.Muted) }) { haptics.confirm(); onAddToWorkout(ex) }

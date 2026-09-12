@@ -72,10 +72,7 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            Column {
-                Text("Trends", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
-                Text("Continuous biometrics from your watch, last 24 hours.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
-            }
+            Text("Trends", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
         }
         item {
             SoftCard(accent = HealthColors.Terracotta, contentPadding = PaddingValues(16.dp)) {
@@ -97,7 +94,6 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
                     Spacer(Modifier.width(4.dp))
                     Text("bpm now", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 6.dp))
                     Spacer(Modifier.weight(1f))
-                    Text("Drag to scrub", style = MaterialTheme.typography.labelSmall, color = HealthColors.Faint)
                 }
                 ScrubbableLineChart(
                     series = listOf(ChartSeries(hrDay.map { it.bpm.toFloat() }, HealthColors.Terracotta)),
@@ -118,7 +114,7 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
                 BaselineTile("HRV", hrv.current, "ms", hrv.sevenDayAverage, false, HealthColors.Sky, listOf(52f, 55f, 51f, 58f, 60f, 57f, 62f), Modifier.weight(1f))
             }
         }
-        item { SectionHeader("Blood oxygen", subtitle = "Spot checks + overnight SpO₂") }
+        item { SectionHeader("Blood oxygen") }
         item {
             val zones = remember(spo2) {
                 listOf(
@@ -152,7 +148,7 @@ fun TrendsScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
                 }
             }
         }
-        item { SectionHeader("Stress", subtitle = "Zepp stress index across the day") }
+        item { SectionHeader("Stress") }
         item {
             val z = remember(stress) { SampleData.stressZones(stress) }
             SoftCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(16.dp)) {

@@ -119,10 +119,7 @@ fun WeightTrendScreen(
                     modifier = Modifier.clip(CircleShape).clickable(onClick = onBack).padding(6.dp),
                 )
                 Spacer(Modifier.width(6.dp))
-                Column(Modifier.weight(1f)) {
-                    Text("Weight & body", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
-                    Text("Fitbit Aria + BLE scale, unified", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
-                }
+                Text("Weight & body", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink, modifier = Modifier.weight(1f))
                 UnitToggle(unit, { unit = it }, accent = HealthColors.Sky)
             }
         }
@@ -132,10 +129,7 @@ fun WeightTrendScreen(
         item {
             SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        Eyebrow("Trend", HealthColors.Sky)
-                        Text("${window.size} weigh-ins", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
-                    }
+                    Eyebrow("Trend", HealthColors.Sky, Modifier.weight(1f))
                     SegmentedControl(
                         Timeframe.entries.map { it.label }, timeframe.ordinal, { haptics.tick(); timeframe = Timeframe.entries[it] },
                         Modifier.width(200.dp), accent = HealthColors.Sky, height = 32.dp,
@@ -156,7 +150,7 @@ fun WeightTrendScreen(
         }
         if (composition != null) {
             item {
-                SectionHeader("Body composition", subtitle = "From latest smart-scale reading")
+                SectionHeader("Body composition")
             }
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -179,7 +173,7 @@ fun WeightTrendScreen(
         item {
             PrimaryButton("Log Weight", icon = Icons.Default.Add, color = HealthColors.Sky, modifier = Modifier.fillMaxWidth()) { showLog = true }
         }
-        item { SectionHeader("Weigh-in history", subtitle = "${sorted.size} entries") }
+        item { SectionHeader("Weigh-in history") }
         items(sorted.asReversed().take(30).size, key = { sorted.asReversed()[it].id }) { i ->
             val entry = sorted.asReversed()[i]
             val prev = sorted.asReversed().getOrNull(i + 1)
@@ -253,7 +247,7 @@ private fun ScaleSyncCard(scanning: Boolean, onScan: () -> Unit) {
             Column(Modifier.weight(1f)) {
                 Text(if (scanning) "Scanning for scales…" else "Connect Scale", style = MaterialTheme.typography.titleMedium, color = HealthColors.Ink)
                 Text(
-                    if (scanning) "Step on the scale to broadcast a reading (GATT 0x181D)" else "Pair a Bluetooth smart scale for automatic weigh-ins",
+                    if (scanning) "Step on the scale" else "Pair a Bluetooth scale",
                     style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted,
                 )
                 Spacer(Modifier.height(10.dp))

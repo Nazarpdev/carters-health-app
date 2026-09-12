@@ -135,7 +135,7 @@ fun HealthApp(
             if (s != null) {
                 CelebrationBanner(
                     title = if (s.prs.isEmpty()) "Workout saved" else "${s.prs.size} new PR${if (s.prs.size > 1) "s" else ""}!",
-                    subtitle = "${s.totalSets} sets · ${s.totalReps} reps · ${s.totalVolumeLbs.format0()} lbs moved",
+                    subtitle = "${s.totalSets} sets · ${s.totalVolumeLbs.format0()} lbs",
                 )
             }
         }

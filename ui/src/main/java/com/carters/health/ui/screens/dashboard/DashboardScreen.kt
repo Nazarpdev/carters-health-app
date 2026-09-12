@@ -73,15 +73,15 @@ internal data class Greeting(val title: String, val body: String, val accent: Co
 
 internal fun greetingFor(hour: Int, readiness: Int, strain: Double): Greeting {
     val recoveryLine = when {
-        readiness >= 80 -> "your recovery is primed for high intensity"
-        readiness >= 60 -> "you're recovered enough for a solid session"
-        else -> "keep today light — your body is still rebuilding"
+        readiness >= 80 -> "Ready to go hard."
+        readiness >= 60 -> "Ready for a solid session."
+        else -> "Keep it light today."
     }
     return when (hour) {
-        in 5..11 -> Greeting("Good morning", "$recoveryLine.", HealthColors.Ochre)
-        in 12..16 -> Greeting("Good afternoon", if (strain < 8) "plenty of room left for strain today." else "$recoveryLine.", HealthColors.Green)
-        in 17..20 -> Greeting("Good evening", if (strain >= 14) "big day — start winding down." else "$recoveryLine.", HealthColors.Terracotta)
-        else -> Greeting("Rest & recharge tonight", "dim the lights — deep sleep builds tomorrow's readiness.", HealthColors.Lavender)
+        in 5..11 -> Greeting("Good morning", recoveryLine, HealthColors.Ochre)
+        in 12..16 -> Greeting("Good afternoon", if (strain < 8) "Room left to move." else recoveryLine, HealthColors.Green)
+        in 17..20 -> Greeting("Good evening", if (strain >= 14) "Start winding down." else recoveryLine, HealthColors.Terracotta)
+        else -> Greeting("Rest & recharge", "Dim the lights.", HealthColors.Lavender)
     }
 }
 
@@ -110,7 +110,7 @@ fun DashboardScreen(
     ) {
         val edge = Modifier.padding(horizontal = 20.dp)
         item {
-            GreetingHeader(greeting, watch.connected, watch.deviceName, watch.batteryPercent, edge)
+            GreetingHeader(greeting, watch.connected, watch.batteryPercent, edge)
         }
         item {
             PillarDialCard(readiness, edge)
@@ -123,7 +123,7 @@ fun DashboardScreen(
             )
         }
         item {
-            SectionHeader("Body & activity", subtitle = "Swipe for more", modifier = edge)
+            SectionHeader("Body & activity", modifier = edge)
         }
         item {
             val baseline30 = remember(weights) {
@@ -199,9 +199,9 @@ private fun WindDownTile(hour: Int, lastSleepMinutes: Int, modifier: Modifier = 
     val debt = (480 - lastSleepMinutes).coerceAtLeast(0)
     val bedtime = if (debt > 60) "9:45 PM" else "10:30 PM"
     val copy = when {
-        hour >= 21 -> "Screens down. Lights warm."
-        debt > 60 -> "Repay ${debt / 60}h ${debt % 60}m of sleep debt tonight."
-        else -> "Rhythm is steady. Keep the routine."
+        hour >= 21 -> "Screens down."
+        debt > 60 -> "Repay ${debt / 60}h ${debt % 60}m tonight."
+        else -> "Rhythm is steady."
     }
     SoftCard(modifier = modifier, accent = HealthColors.Lavender, tinted = true, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -218,7 +218,7 @@ private fun WindDownTile(hour: Int, lastSleepMinutes: Int, modifier: Modifier = 
 }
 
 @Composable
-private fun GreetingHeader(greeting: Greeting, connected: Boolean, deviceName: String, battery: Int, modifier: Modifier = Modifier) {
+private fun GreetingHeader(greeting: Greeting, connected: Boolean, battery: Int, modifier: Modifier = Modifier) {
     Column(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Row(
@@ -249,12 +249,7 @@ private fun GreetingHeader(greeting: Greeting, connected: Boolean, deviceName: S
             }
         }
         Spacer(Modifier.height(12.dp))
-        Text(
-            greeting.body.replaceFirstChar { it.uppercase() },
-            style = MaterialTheme.typography.headlineMedium,
-            color = HealthColors.Ink,
-        )
-        Text(deviceName, style = MaterialTheme.typography.bodySmall, color = HealthColors.Faint)
+        Text(greeting.body, style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
     }
 }
 

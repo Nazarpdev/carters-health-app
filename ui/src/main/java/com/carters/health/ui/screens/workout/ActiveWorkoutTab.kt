@@ -129,7 +129,7 @@ fun ActiveWorkoutTab(
             Column(Modifier.background(HealthColors.Canvas).padding(bottom = 4.dp)) {
                 RestTimerCard(timer, exerciseName = session.lastCompletedExerciseName)
                 AnimatedVisibility(visible = celebrate, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
-                    CelebrationBanner("Catch your breath — explosive set!", "Rest complete. Load the bar.")
+                    CelebrationBanner("Rest complete", "Load the bar.")
                 }
             }
         }
@@ -167,34 +167,31 @@ private fun ChronometerHeader(session: WorkoutSessionState, onFinish: () -> Unit
     }
     SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(18.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Timer, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(6.dp))
-                    Text(formatClock(elapsed), style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink, fontWeight = FontWeight.Bold)
-                }
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    BasicTextField(
-                        value = session.name,
-                        onValueChange = { session.name = it },
-                        singleLine = true,
-                        textStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.InkSoft, fontSize = MaterialTheme.typography.titleMedium.fontSize, fontWeight = FontWeight.SemiBold),
-                        cursorBrush = SolidColor(HealthColors.Green),
-                        modifier = Modifier.weight(1f),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Icon(Icons.Default.Edit, contentDescription = "Rename", tint = HealthColors.Faint, modifier = Modifier.size(14.dp))
-                }
-            }
+            Icon(Icons.Default.Timer, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
+            Spacer(Modifier.width(6.dp))
+            Text(formatClock(elapsed), style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink)
+        }
+        Spacer(Modifier.height(6.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            BasicTextField(
+                value = session.name,
+                onValueChange = { session.name = it },
+                singleLine = true,
+                textStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.InkSoft, fontSize = MaterialTheme.typography.titleMedium.fontSize, fontWeight = FontWeight.SemiBold),
+                cursorBrush = SolidColor(HealthColors.Green),
+                modifier = Modifier.weight(1f),
+            )
+            Spacer(Modifier.width(6.dp))
+            Icon(Icons.Default.Edit, contentDescription = "Rename", tint = HealthColors.Faint, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(12.dp))
             Box(
                 Modifier
                     .clip(RoundedCornerShape(14.dp))
                     .background(HealthColors.Green)
                     .clickable(onClick = onFinish)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
             ) {
-                Text("Finish", style = MaterialTheme.typography.labelLarge, color = HealthColors.Canvas, fontWeight = FontWeight.Bold)
+                Text("Finish", style = MaterialTheme.typography.labelLarge, color = HealthColors.Card)
             }
         }
         Spacer(Modifier.height(12.dp))
@@ -239,7 +236,7 @@ fun RestTimerCard(timer: RestTimerState, exerciseName: String?, modifier: Modifi
                 Spacer(Modifier.width(6.dp))
                 Text("Rest timer", style = MaterialTheme.typography.labelLarge, color = HealthColors.InkSoft)
                 Spacer(Modifier.weight(1f))
-                Text("auto-starts on ✓", style = MaterialTheme.typography.labelSmall, color = HealthColors.Faint)
+                Text("auto-starts", style = MaterialTheme.typography.labelSmall, color = HealthColors.Faint)
             }
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -623,7 +620,7 @@ private fun FinishWorkoutDialog(session: WorkoutSessionState, onDismiss: () -> U
                 }
             } else {
                 Spacer(Modifier.height(14.dp))
-                Text("Solid work. Recovery starts now — hydrate and eat.", style = MaterialTheme.typography.bodyMedium, color = HealthColors.InkSoft)
+                Text("Solid work. Recovery starts now.", style = MaterialTheme.typography.bodyMedium, color = HealthColors.InkSoft)
             }
             Spacer(Modifier.height(18.dp))
             PrimaryButton("Save Workout", color = HealthColors.Green, modifier = Modifier.fillMaxWidth(), onClick = onConfirm)

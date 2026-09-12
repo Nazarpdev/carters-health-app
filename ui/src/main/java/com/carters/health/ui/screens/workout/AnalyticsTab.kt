@@ -79,7 +79,7 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
             }
         }
         item {
-            SectionHeader("Overload curve", subtitle = "Drag across the chart to inspect any session")
+            SectionHeader("Overload curve")
         }
         item {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -98,7 +98,7 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
             val max1rm = pr?.maxEstimatedOneRepMax ?: curve.maxOfOrNull { it.estimatedOneRepMax } ?: 0.0
             val maxVol = pr?.maxVolumeSetLbs ?: (maxW * 5)
             Column {
-                SectionHeader("All-time PRs", subtitle = selected?.name ?: "")
+                SectionHeader("All-time PRs")
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     PrCard("Max weight", formatWeight(maxW, unit), unit.label, HealthColors.Ochre, Modifier.weight(1f))
@@ -107,7 +107,7 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
                 }
             }
         }
-        item { SectionHeader("Workout history", subtitle = "${history.size} recent sessions") }
+        item { SectionHeader("Workout history") }
         items(history, key = { it.id }) { entry -> HistoryCard(entry, unit) }
     }
 }
@@ -127,10 +127,7 @@ private fun OverloadChartCard(exercise: Exercise?, curve: List<com.carters.healt
                 if (curve.isNotEmpty()) {
                     val first = curve.first().estimatedOneRepMax
                     val last = curve.last().estimatedOneRepMax
-                    Text(
-                        "+${formatWeight(last - first, unit)} ${unit.label} est. 1RM over ${curve.size} sessions",
-                        style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted,
-                    )
+                    Text("+${formatWeight(last - first, unit)} ${unit.label} est. 1RM", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                 }
             }
             LegendDot(HealthColors.Green, "Est. 1RM")
