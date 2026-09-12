@@ -9,7 +9,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -78,12 +77,13 @@ import com.carters.health.data.model.WorkoutSummary
 import com.carters.health.data.model.format0
 import com.carters.health.ui.components.CountdownRing
 import com.carters.health.ui.components.Eyebrow
-import com.carters.health.ui.components.GlowCard
-import com.carters.health.ui.components.GradientButton
+import com.carters.health.ui.components.SoftCard
+import com.carters.health.ui.components.PrimaryButton
 import com.carters.health.ui.components.NumberField
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.LocalHealthHaptics
+import com.carters.health.ui.theme.SansFamily
 import kotlinx.coroutines.delay
 
 private val REST_PRESETS = listOf(30, 60, 90, 120, 180)
@@ -126,7 +126,7 @@ fun ActiveWorkoutTab(
     ) {
         item { ChronometerHeader(session, onFinish = { showFinish = true }) }
         stickyHeader {
-            Column(Modifier.background(HealthColors.Obsidian).padding(bottom = 4.dp)) {
+            Column(Modifier.background(HealthColors.Canvas).padding(bottom = 4.dp)) {
                 RestTimerCard(timer, exerciseName = session.lastCompletedExerciseName)
                 AnimatedVisibility(visible = celebrate, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
                     CelebrationBanner("Catch your breath — explosive set!", "Rest complete. Load the bar.")
@@ -137,7 +137,7 @@ fun ActiveWorkoutTab(
             ExerciseCard(session, ex)
         }
         item {
-            AddButton("Add Exercise", accent = HealthColors.Amber) { showAddExercise = true }
+            AddButton("Add Exercise", accent = HealthColors.Green) { showAddExercise = true }
         }
     }
 
@@ -165,43 +165,43 @@ private fun ChronometerHeader(session: WorkoutSessionState, onFinish: () -> Unit
             delay(1000)
         }
     }
-    GlowCard(accent = HealthColors.Amber, contentPadding = PaddingValues(18.dp)) {
+    SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(18.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Timer, contentDescription = null, tint = HealthColors.Gold, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Default.Timer, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(formatClock(elapsed), style = MaterialTheme.typography.displaySmall, color = HealthColors.OnSurface, fontWeight = FontWeight.Bold)
+                    Text(formatClock(elapsed), style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink, fontWeight = FontWeight.Bold)
                 }
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     BasicTextField(
                         value = session.name,
                         onValueChange = { session.name = it },
                         singleLine = true,
-                        textStyle = TextStyle(color = HealthColors.Sand, fontSize = MaterialTheme.typography.titleMedium.fontSize, fontWeight = FontWeight.SemiBold),
-                        cursorBrush = SolidColor(HealthColors.Amber),
+                        textStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.InkSoft, fontSize = MaterialTheme.typography.titleMedium.fontSize, fontWeight = FontWeight.SemiBold),
+                        cursorBrush = SolidColor(HealthColors.Green),
                         modifier = Modifier.weight(1f),
                     )
                     Spacer(Modifier.width(6.dp))
-                    Icon(Icons.Default.Edit, contentDescription = "Rename", tint = HealthColors.ClayDim, modifier = Modifier.size(14.dp))
+                    Icon(Icons.Default.Edit, contentDescription = "Rename", tint = HealthColors.Faint, modifier = Modifier.size(14.dp))
                 }
             }
             Spacer(Modifier.width(12.dp))
             Box(
                 Modifier
                     .clip(RoundedCornerShape(14.dp))
-                    .background(HealthColors.emeraldMint)
+                    .background(HealthColors.Green)
                     .clickable(onClick = onFinish)
                     .padding(horizontal = 16.dp, vertical = 12.dp),
             ) {
-                Text("Finish", style = MaterialTheme.typography.labelLarge, color = HealthColors.Obsidian, fontWeight = FontWeight.Bold)
+                Text("Finish", style = MaterialTheme.typography.labelLarge, color = HealthColors.Canvas, fontWeight = FontWeight.Bold)
             }
         }
         Spacer(Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill("${session.completedSets} ${if (session.completedSets == 1) "set" else "sets"}", color = HealthColors.Emerald, filled = true)
-            Pill("${session.totalReps} reps", color = HealthColors.Mint)
-            Pill("${Units.displayWeight(session.totalVolumeLbs, session.unit).format0()} ${session.unit.label}", color = HealthColors.Gold)
+            Pill("${session.completedSets} ${if (session.completedSets == 1) "set" else "sets"}", color = HealthColors.Green)
+            Pill("${session.totalReps} reps", color = HealthColors.Green)
+            Pill("${Units.displayWeight(session.totalVolumeLbs, session.unit).format0()} ${session.unit.label}", color = HealthColors.Green)
         }
     }
 }
@@ -210,36 +210,36 @@ private fun ChronometerHeader(session: WorkoutSessionState, onFinish: () -> Unit
 @Composable
 fun RestTimerCard(timer: RestTimerState, exerciseName: String?, modifier: Modifier = Modifier) {
     val haptics = LocalHealthHaptics.current
-    val accent = if (timer.active) HealthColors.Mint else HealthColors.Clay
-    GlowCard(modifier = modifier, accent = accent, glow = timer.active, contentPadding = PaddingValues(14.dp), container = HealthColors.Surface) {
+    val accent = if (timer.active) HealthColors.Green else HealthColors.Muted
+    SoftCard(modifier = modifier, accent = accent, tinted = timer.active, contentPadding = PaddingValues(14.dp), container = HealthColors.CardAlt) {
         if (timer.active) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CountdownRing(fraction = timer.fraction, running = timer.running, modifier = Modifier.size(92.dp), strokeWidth = 8.dp) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(formatClock(timer.remainingSeconds.toLong()), style = MaterialTheme.typography.titleLarge, color = HealthColors.OnSurface, fontWeight = FontWeight.Bold)
-                        Text(if (timer.paused) "PAUSED" else "REST", style = MaterialTheme.typography.labelSmall, color = HealthColors.Mint)
+                        Text(formatClock(timer.remainingSeconds.toLong()), style = MaterialTheme.typography.titleLarge, color = HealthColors.Ink, fontWeight = FontWeight.Bold)
+                        Text(if (timer.paused) "paused" else "rest", style = MaterialTheme.typography.labelSmall, color = HealthColors.Green)
                     }
                 }
                 Spacer(Modifier.width(14.dp))
                 Column(Modifier.weight(1f)) {
-                    Eyebrow("Resting after", HealthColors.Mint)
-                    Text(exerciseName ?: "Set complete", style = MaterialTheme.typography.titleSmall, color = HealthColors.OnSurface, maxLines = 1)
+                    Eyebrow("Resting after", HealthColors.Green)
+                    Text(exerciseName ?: "Set complete", style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink, maxLines = 1)
                     Spacer(Modifier.height(10.dp))
                     FlowRow(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         TimerChip("+30s") { haptics.tick(); timer.adjust(30) }
                         TimerChip("-15s") { haptics.tick(); timer.adjust(-15) }
                         TimerChip(if (timer.paused) "Resume" else "Pause", icon = if (timer.paused) Icons.Default.PlayArrow else Icons.Default.Pause) { haptics.tick(); timer.togglePause() }
-                        TimerChip("Skip", icon = Icons.Default.SkipNext, color = HealthColors.Coral) { haptics.tick(); timer.skip() }
+                        TimerChip("Skip", icon = Icons.Default.SkipNext, color = HealthColors.Terracotta) { haptics.tick(); timer.skip() }
                     }
                 }
             }
         } else {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Timer, contentDescription = null, tint = HealthColors.Clay, modifier = Modifier.size(16.dp))
+                Icon(Icons.Default.Timer, contentDescription = null, tint = HealthColors.Muted, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
-                Text("Rest timer", style = MaterialTheme.typography.labelLarge, color = HealthColors.Sand)
+                Text("Rest timer", style = MaterialTheme.typography.labelLarge, color = HealthColors.InkSoft)
                 Spacer(Modifier.weight(1f))
-                Text("auto-starts on ✓", style = MaterialTheme.typography.labelSmall, color = HealthColors.ClayDim)
+                Text("auto-starts on ✓", style = MaterialTheme.typography.labelSmall, color = HealthColors.Faint)
             }
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
@@ -256,14 +256,13 @@ private fun TimerChip(
     text: String,
     modifier: Modifier = Modifier,
     icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
-    color: Color = HealthColors.Mint,
+    color: Color = HealthColors.Green,
     onClick: () -> Unit,
 ) {
     Row(
         modifier
             .clip(CircleShape)
-            .background(color.copy(alpha = 0.12f))
-            .border(1.dp, color.copy(alpha = 0.4f), CircleShape)
+            .background(HealthColors.Card)
             .clickable(onClick = onClick)
             .padding(horizontal = 10.dp, vertical = 7.dp),
         horizontalArrangement = Arrangement.Center,
@@ -278,22 +277,21 @@ private fun TimerChip(
 }
 
 @Composable
-fun CelebrationBanner(title: String, subtitle: String, accent: Color = HealthColors.Gold) {
+fun CelebrationBanner(title: String, subtitle: String, accent: Color = HealthColors.Green) {
     Row(
         Modifier
             .padding(top = 8.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(16.dp))
-            .background(Brush.horizontalGradient(listOf(accent.copy(alpha = 0.3f), HealthColors.Coral.copy(alpha = 0.18f))))
-            .border(1.dp, accent.copy(alpha = 0.6f), RoundedCornerShape(16.dp))
+            .background(Brush.horizontalGradient(listOf(accent.copy(alpha = 0.3f), HealthColors.Terracotta.copy(alpha = 0.18f))))
             .padding(14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = accent)
         Spacer(Modifier.width(10.dp))
         Column {
-            Text(title, style = MaterialTheme.typography.titleSmall, color = HealthColors.OnSurface)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = HealthColors.Sand)
+            Text(title, style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
+            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = HealthColors.InkSoft)
         }
     }
 }
@@ -302,20 +300,20 @@ fun CelebrationBanner(title: String, subtitle: String, accent: Color = HealthCol
 private fun ExerciseCard(session: WorkoutSessionState, ex: ExerciseState) {
     var menu by remember { mutableStateOf(false) }
     val haptics = LocalHealthHaptics.current
-    GlowCard(accent = HealthColors.Amber, glow = false, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text(ex.exercise.name, style = MaterialTheme.typography.titleMedium, color = HealthColors.OnSurface)
+                Text(ex.exercise.name, style = MaterialTheme.typography.titleMedium, color = HealthColors.Ink)
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    Pill(ex.exercise.muscleGroup.label.uppercase(), color = HealthColors.Amber, filled = true)
-                    Pill(ex.exercise.equipment.label, color = HealthColors.Clay)
-                    Pill("rest ${ex.exercise.defaultRestSeconds}s", color = HealthColors.Mint)
+                    Pill(ex.exercise.muscleGroup.label, color = HealthColors.Green)
+                    Pill(ex.exercise.equipment.label, color = HealthColors.Muted)
+                    Pill("rest ${ex.exercise.defaultRestSeconds}s", color = HealthColors.Green)
                 }
             }
             Box {
                 Icon(
-                    Icons.Default.MoreVert, contentDescription = "Options", tint = HealthColors.Clay,
+                    Icons.Default.MoreVert, contentDescription = "Options", tint = HealthColors.Muted,
                     modifier = Modifier.clip(CircleShape).clickable { menu = true }.padding(6.dp),
                 )
                 DropdownMenu(expanded = menu, onDismissRequest = { menu = false }) {
@@ -344,7 +342,7 @@ private fun ExerciseCard(session: WorkoutSessionState, ex: ExerciseState) {
             }
         }
         Spacer(Modifier.height(6.dp))
-        AddButton("Add Set", accent = HealthColors.Clay, compact = true) { haptics.tick(); session.addSet(ex) }
+        AddButton("Add Set", accent = HealthColors.Muted, compact = true) { haptics.tick(); session.addSet(ex) }
     }
 }
 
@@ -358,18 +356,18 @@ private val COL_DONE = 0.7f
 @Composable
 private fun TableHeader(unit: WeightUnit) {
     Row(Modifier.fillMaxWidth().padding(horizontal = 2.dp), verticalAlignment = Alignment.CenterVertically) {
-        HeaderCell("SET", COL_SET)
-        HeaderCell("PREVIOUS", COL_PREV)
-        HeaderCell(unit.label.uppercase(), COL_WEIGHT)
-        HeaderCell("REPS", COL_REPS)
+        HeaderCell("Set", COL_SET)
+        HeaderCell("Previous", COL_PREV)
+        HeaderCell(unit.label, COL_WEIGHT)
+        HeaderCell("Reps", COL_REPS)
         HeaderCell("RPE", COL_RPE)
-        HeaderCell("DONE", COL_DONE)
+        HeaderCell("Done", COL_DONE)
     }
 }
 
 @Composable
 private fun androidx.compose.foundation.layout.RowScope.HeaderCell(text: String, weight: Float) {
-    Text(text, style = MaterialTheme.typography.labelSmall, color = HealthColors.ClayDim, textAlign = TextAlign.Center, modifier = Modifier.weight(weight))
+    Text(text, style = MaterialTheme.typography.labelSmall, color = HealthColors.Faint, textAlign = TextAlign.Center, modifier = Modifier.weight(weight))
 }
 
 @Composable
@@ -382,7 +380,7 @@ private fun SetRow(
     onRemove: () -> Unit,
 ) {
     val rowColor by animateColorAsState(
-        if (set.completed) HealthColors.Emerald.copy(alpha = 0.10f) else Color.Transparent, label = "row",
+        if (set.completed) HealthColors.Green.copy(alpha = 0.10f) else Color.Transparent, label = "row",
     )
     var weightText by remember(set.id, unit) { mutableStateOf(formatWeight(set.weightLbs, unit)) }
     var repsText by remember(set.id) { mutableStateOf(set.reps?.toString() ?: "") }
@@ -406,12 +404,11 @@ private fun SetRow(
                 Modifier
                     .size(30.dp)
                     .clip(CircleShape)
-                    .background(if (warm) HealthColors.Amber.copy(alpha = 0.2f) else HealthColors.SurfaceHigh)
-                    .border(1.dp, if (warm) HealthColors.Amber.copy(alpha = 0.7f) else HealthColors.Border, CircleShape)
+                    .background(if (warm) HealthColors.Green.copy(alpha = 0.2f) else HealthColors.Field)
                     .clickable(onClick = onToggleWarmup),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(label, style = MaterialTheme.typography.labelMedium, color = if (warm) HealthColors.Amber else HealthColors.Sand)
+                Text(label, style = MaterialTheme.typography.labelMedium, color = if (warm) HealthColors.Green else HealthColors.InkSoft)
             }
         }
         // Previous benchmark
@@ -419,7 +416,7 @@ private fun SetRow(
             val p = set.previous
             Text(
                 if (p == null) "—" else "${formatWeight(p.weightLbs, unit)} × ${p.reps}",
-                style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay, textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted, textAlign = TextAlign.Center,
             )
         }
         NumberField(
@@ -439,7 +436,7 @@ private fun SetRow(
             onValueChange = { t -> rpeText = t; set.rpe = t.toDoubleOrNull()?.coerceIn(1.0, 10.0) },
             modifier = Modifier.weight(COL_RPE).padding(horizontal = 3.dp),
             placeholder = "RPE",
-            accent = HealthColors.Lavender,
+            accent = HealthColors.Sage,
             enabled = !set.completed,
         )
         Box(Modifier.weight(COL_DONE), contentAlignment = Alignment.Center) {
@@ -451,11 +448,11 @@ private fun SetRow(
         Row(Modifier.padding(start = 8.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 if (e1rm != null) "est. 1RM ${formatWeight(e1rm, unit)} ${unit.label}" else "logged",
-                style = MaterialTheme.typography.labelSmall, color = HealthColors.Emerald,
+                style = MaterialTheme.typography.labelSmall, color = HealthColors.Green,
             )
             Spacer(Modifier.weight(1f))
             Icon(
-                Icons.Default.Close, contentDescription = "Remove set", tint = HealthColors.ClayDim,
+                Icons.Default.Close, contentDescription = "Remove set", tint = HealthColors.Faint,
                 modifier = Modifier.size(20.dp).clip(CircleShape).clickable(onClick = onRemove).padding(3.dp),
             )
         }
@@ -465,19 +462,18 @@ private fun SetRow(
 @Composable
 private fun DoneButton(done: Boolean, onClick: () -> Unit) {
     val scale by animateFloatAsState(if (done) 1.08f else 1f, com.carters.health.ui.components.Motion.softSpring, label = "doneScale")
-    val bg by animateColorAsState(if (done) HealthColors.Emerald else HealthColors.SurfaceHigh, label = "doneBg")
-    val border by animateColorAsState(if (done) HealthColors.Mint else HealthColors.Border, label = "doneBorder")
+    val bg by animateColorAsState(if (done) HealthColors.Green else HealthColors.Field, label = "doneBg")
+    val border by animateColorAsState(if (done) HealthColors.Green else HealthColors.Hairline, label = "doneBorder")
     Box(
         Modifier
             .size(36.dp)
             .scale(scale)
             .clip(RoundedCornerShape(11.dp))
             .background(bg)
-            .border(1.5.dp, border, RoundedCornerShape(11.dp))
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(Icons.Default.Check, contentDescription = "Complete set", tint = if (done) HealthColors.Obsidian else HealthColors.Clay, modifier = Modifier.size(20.dp))
+        Icon(Icons.Default.Check, contentDescription = "Complete set", tint = if (done) HealthColors.Canvas else HealthColors.Muted, modifier = Modifier.size(20.dp))
     }
 }
 
@@ -488,8 +484,7 @@ fun AddButton(text: String, accent: Color, compact: Boolean = false, onClick: ()
         Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(accent.copy(alpha = if (compact) 0.06f else 0.12f))
-            .border(1.dp, accent.copy(alpha = if (compact) 0.25f else 0.5f), shape)
+            .background(if (compact) HealthColors.Field else HealthColors.tint(accent))
             .clickable(onClick = onClick)
             .padding(vertical = if (compact) 9.dp else 14.dp),
         horizontalArrangement = Arrangement.Center,
@@ -510,9 +505,9 @@ fun AddExerciseSheet(library: List<Exercise>, onDismiss: () -> Unit, onPick: (Ex
     val results = remember(query, group, library) {
         library.filter { (group == null || it.muscleGroup == group) && it.name.contains(query, ignoreCase = true) }
     }
-    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheet, containerColor = HealthColors.Espresso, dragHandle = null) {
+    ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheet, containerColor = HealthColors.Canvas, dragHandle = null) {
         Column(Modifier.padding(horizontal = 20.dp, vertical = 16.dp)) {
-            Text("Add exercise", style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
+            Text("Add exercise", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             Spacer(Modifier.height(12.dp))
             SearchField(query, { query = it }, "Search ${library.size} exercises")
             Spacer(Modifier.height(10.dp))
@@ -532,27 +527,26 @@ fun SearchField(value: String, onValueChange: (String) -> Unit, placeholder: Str
         Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(HealthColors.Surface)
-            .border(1.dp, HealthColors.Border, shape)
+            .background(HealthColors.Field)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(Icons.Default.Search, contentDescription = null, tint = HealthColors.Clay, modifier = Modifier.size(18.dp))
+        Icon(Icons.Default.Search, contentDescription = null, tint = HealthColors.Muted, modifier = Modifier.size(18.dp))
         Spacer(Modifier.width(8.dp))
         BasicTextField(
             value = value,
             onValueChange = onValueChange,
             singleLine = true,
-            textStyle = TextStyle(color = HealthColors.OnSurface, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
-            cursorBrush = SolidColor(HealthColors.Amber),
+            textStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Ink, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
+            cursorBrush = SolidColor(HealthColors.Green),
             modifier = Modifier.weight(1f),
             decorationBox = { inner ->
-                if (value.isEmpty()) Text(placeholder, color = HealthColors.ClayDim, style = MaterialTheme.typography.bodyLarge)
+                if (value.isEmpty()) Text(placeholder, color = HealthColors.Faint, style = MaterialTheme.typography.bodyLarge)
                 inner()
             },
         )
         if (value.isNotEmpty()) {
-            Icon(Icons.Default.Close, contentDescription = "Clear", tint = HealthColors.Clay, modifier = Modifier.size(16.dp).clickable { onValueChange("") })
+            Icon(Icons.Default.Close, contentDescription = "Clear", tint = HealthColors.Muted, modifier = Modifier.size(16.dp).clickable { onValueChange("") })
         }
     }
 }
@@ -560,10 +554,10 @@ fun SearchField(value: String, onValueChange: (String) -> Unit, placeholder: Str
 @Composable
 fun MuscleFilterRow(selected: MuscleGroup?, onSelect: (MuscleGroup?) -> Unit) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-        item { Pill("All", color = if (selected == null) HealthColors.Amber else HealthColors.Clay, filled = selected == null) { onSelect(null) } }
+        item { Pill("All", color = if (selected == null) HealthColors.Green else HealthColors.Muted, filled = selected == null) { onSelect(null) } }
         items(MuscleGroup.entries) { g ->
             val on = selected == g
-            Pill(g.label, color = if (on) HealthColors.Amber else HealthColors.Clay, filled = on) { onSelect(if (on) null else g) }
+            Pill(g.label, color = if (on) HealthColors.Green else HealthColors.Muted, filled = on) { onSelect(if (on) null else g) }
         }
     }
 }
@@ -575,25 +569,24 @@ fun ExerciseListRow(ex: Exercise, trailing: (@Composable () -> Unit)? = null, on
         Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(HealthColors.Surface)
-            .border(1.dp, HealthColors.Border, shape)
+            .background(HealthColors.Card)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(ex.name, style = MaterialTheme.typography.titleSmall, color = HealthColors.OnSurface)
-                if (ex.isCustom) { Spacer(Modifier.width(6.dp)); Pill("Custom", color = HealthColors.Lavender, filled = true) }
+                Text(ex.name, style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
+                if (ex.isCustom) { Spacer(Modifier.width(6.dp)); Pill("Custom", color = HealthColors.Sage, filled = true) }
             }
             Spacer(Modifier.height(4.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Pill(ex.muscleGroup.label, color = HealthColors.Amber)
-                Pill(ex.equipment.label, color = HealthColors.Clay)
-                Pill("${ex.defaultRestSeconds}s rest", color = HealthColors.Mint)
+                Pill(ex.muscleGroup.label, color = HealthColors.Green)
+                Pill(ex.equipment.label, color = HealthColors.Muted)
+                Pill("${ex.defaultRestSeconds}s rest", color = HealthColors.Green)
             }
         }
-        if (trailing != null) trailing() else Icon(Icons.Default.Add, contentDescription = null, tint = HealthColors.Amber)
+        if (trailing != null) trailing() else Icon(Icons.Default.Add, contentDescription = null, tint = HealthColors.Green)
     }
 }
 
@@ -602,41 +595,41 @@ private fun FinishWorkoutDialog(session: WorkoutSessionState, onDismiss: () -> U
     val summary = remember { session.summary() }
     val unit = session.unit
     Dialog(onDismissRequest = onDismiss) {
-        GlowCard(accent = HealthColors.Gold, contentPadding = PaddingValues(22.dp)) {
+        SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(22.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = HealthColors.Gold, modifier = Modifier.size(28.dp))
+                Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(28.dp))
                 Spacer(Modifier.width(10.dp))
                 Column {
-                    Text("Workout complete", style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
-                    Text(session.name, style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                    Text("Workout complete", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
+                    Text(session.name, style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                 }
             }
             Spacer(Modifier.height(18.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SummaryTile("Volume", Units.displayWeight(summary.totalVolumeLbs, unit).format0(), unit.label, HealthColors.Gold, Modifier.weight(1f))
-                SummaryTile("Duration", formatClock(summary.durationSeconds), "", HealthColors.Mint, Modifier.weight(1f))
+                SummaryTile("Volume", Units.displayWeight(summary.totalVolumeLbs, unit).format0(), unit.label, HealthColors.Green, Modifier.weight(1f))
+                SummaryTile("Duration", formatClock(summary.durationSeconds), "", HealthColors.Green, Modifier.weight(1f))
             }
             Spacer(Modifier.height(10.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                SummaryTile("Sets", summary.totalSets.toString(), "", HealthColors.Emerald, Modifier.weight(1f))
-                SummaryTile("Reps", summary.totalReps.toString(), "", HealthColors.Coral, Modifier.weight(1f))
+                SummaryTile("Sets", summary.totalSets.toString(), "", HealthColors.Green, Modifier.weight(1f))
+                SummaryTile("Reps", summary.totalReps.toString(), "", HealthColors.Terracotta, Modifier.weight(1f))
             }
             if (summary.prs.isNotEmpty()) {
                 Spacer(Modifier.height(14.dp))
-                Eyebrow("Personal records", HealthColors.Gold)
+                Eyebrow("Personal records", HealthColors.Green)
                 Spacer(Modifier.height(6.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    summary.prs.take(3).forEach { Pill("PR · $it", color = HealthColors.Gold, filled = true, icon = Icons.Default.EmojiEvents) }
+                    summary.prs.take(3).forEach { Pill("PR · $it", color = HealthColors.Green, filled = true, icon = Icons.Default.EmojiEvents) }
                 }
             } else {
                 Spacer(Modifier.height(14.dp))
-                Text("Solid work. Recovery starts now — hydrate and eat.", style = MaterialTheme.typography.bodyMedium, color = HealthColors.Sand)
+                Text("Solid work. Recovery starts now — hydrate and eat.", style = MaterialTheme.typography.bodyMedium, color = HealthColors.InkSoft)
             }
             Spacer(Modifier.height(18.dp))
-            GradientButton("Save Workout", brush = HealthColors.amberGold, modifier = Modifier.fillMaxWidth(), onClick = onConfirm)
+            PrimaryButton("Save Workout", color = HealthColors.Green, modifier = Modifier.fillMaxWidth(), onClick = onConfirm)
             Spacer(Modifier.height(8.dp))
             Text(
-                "Keep training", style = MaterialTheme.typography.labelLarge, color = HealthColors.Clay,
+                "Keep training", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted,
                 modifier = Modifier.align(Alignment.CenterHorizontally).clip(CircleShape).clickable(onClick = onDismiss).padding(8.dp),
             )
         }
@@ -648,14 +641,13 @@ private fun SummaryTile(label: String, value: String, unit: String, accent: Colo
     Column(
         modifier
             .clip(RoundedCornerShape(14.dp))
-            .background(HealthColors.Surface)
-            .border(1.dp, accent.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+            .background(HealthColors.Field)
             .padding(12.dp),
     ) {
         Eyebrow(label, accent)
         Row(verticalAlignment = Alignment.Bottom) {
-            Text(value, style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
-            if (unit.isNotEmpty()) { Spacer(Modifier.width(4.dp)); Text(unit, style = MaterialTheme.typography.labelMedium, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 3.dp)) }
+            Text(value, style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
+            if (unit.isNotEmpty()) { Spacer(Modifier.width(4.dp)); Text(unit, style = MaterialTheme.typography.labelMedium, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 3.dp)) }
         }
     }
 }

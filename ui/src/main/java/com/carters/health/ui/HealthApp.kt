@@ -12,7 +12,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -47,10 +46,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
@@ -90,7 +87,7 @@ fun HealthApp(
     var toast by remember { mutableStateOf<WorkoutSummary?>(null) }
     LaunchedEffect(toast) { if (toast != null) { delay(3600); toast = null } }
 
-    Box(modifier.fillMaxSize().background(HealthColors.Obsidian)) {
+    Box(modifier.fillMaxSize().background(HealthColors.Canvas)) {
         AnimatedContent(
             targetState = nav.current to nav.tab,
             transitionSpec = {
@@ -166,46 +163,31 @@ private fun HealthTab.icon(): ImageVector = when (this) {
     HealthTab.TRENDS -> Icons.Default.ShowChart
 }
 
-private fun HealthTab.accent(): Color = when (this) {
-    HealthTab.HOME -> HealthColors.Amber
-    HealthTab.TRAIN -> HealthColors.Coral
-    HealthTab.SLEEP -> HealthColors.Lavender
-    HealthTab.TRENDS -> HealthColors.Mint
-}
-
-/** Floating capsule tab bar with per-tab accent glow and springy selection. */
+/** Floating tab bar: flat off-white capsule, selected tab on a soft green pill. */
 @Composable
 fun FloatingTabBar(selected: HealthTab, liveWorkout: Boolean, onSelect: (HealthTab) -> Unit, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(28.dp)
-    val accent by animateColorAsState(selected.accent(), label = "tabAccent")
     Row(
         modifier
             .fillMaxWidth()
-            .drawBehind {
-                drawRoundRect(
-                    brush = Brush.radialGradient(listOf(accent.copy(alpha = 0.25f), Color.Transparent), center = Offset(size.width / 2, size.height), radius = size.width * 0.5f),
-                    topLeft = Offset(0f, size.height * 0.3f),
-                    size = size.copy(height = size.height * 1.1f),
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(60f),
-                )
-            }
+            .shadow(14.dp, shape, ambientColor = HealthColors.Ink.copy(alpha = 0.10f), spotColor = HealthColors.Ink.copy(alpha = 0.10f))
             .clip(shape)
-            .background(HealthColors.Espresso.copy(alpha = 0.96f))
-            .border(1.dp, HealthColors.rim(accent, 0.45f), shape)
+            .background(HealthColors.Card)
             .padding(horizontal = 8.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         HealthTab.entries.forEach { tab ->
             val on = tab == selected
-            val scale by animateFloatAsState(if (on) 1f else 0.92f, Motion.softSpring, label = "tabScale")
-            val tint by animateColorAsState(if (on) tab.accent() else HealthColors.Clay, label = "tint")
+            val scale by animateFloatAsState(if (on) 1f else 0.94f, Motion.softSpring, label = "tabScale")
+            val tint by animateColorAsState(if (on) HealthColors.GreenDeep else HealthColors.Muted, label = "tint")
+            val bg by animateColorAsState(if (on) HealthColors.GreenSoft else Color.Transparent, label = "tabBg")
             val interaction = remember { MutableInteractionSource() }
             Column(
                 Modifier
                     .weight(1f)
                     .clip(RoundedCornerShape(20.dp))
-                    .background(if (on) tab.accent().copy(alpha = 0.14f) else Color.Transparent)
+                    .background(bg)
                     .clickable(interactionSource = interaction, indication = null) { onSelect(tab) }
                     .padding(vertical = 8.dp)
                     .scale(scale),
@@ -214,7 +196,7 @@ fun FloatingTabBar(selected: HealthTab, liveWorkout: Boolean, onSelect: (HealthT
                 Box {
                     Icon(tab.icon(), contentDescription = tab.label, tint = tint, modifier = Modifier.size(22.dp))
                     if (tab == HealthTab.TRAIN && liveWorkout) {
-                        Box(Modifier.align(Alignment.TopEnd).size(7.dp).clip(CircleShape).background(HealthColors.Emerald))
+                        Box(Modifier.align(Alignment.TopEnd).size(7.dp).clip(CircleShape).background(HealthColors.Terracotta))
                     }
                 }
                 Spacer(Modifier.height(3.dp))

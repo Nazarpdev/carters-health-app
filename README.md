@@ -1,8 +1,10 @@
 # Carter's Health
 
 A warm, data-dense Android health tracker built with Jetpack Compose. The interface pairs the
-density of Zepp / Whoop with a restorative "warm tech" aesthetic: an espresso-tinted OLED canvas,
-bioluminescent accents, glowing rim-lit cards and circadian micro-copy.
+density of Zepp / Whoop with a calm, friendly aesthetic: an off-white canvas, flat beige and
+off-grey cards with no borders or gradients, a single sage-green accent (terracotta reserved for
+heart rate and effort), and two typefaces only: Instrument Serif for headlines and hero numbers,
+Nunito for everything else. Fonts are bundled under `ui/src/main/res/font` (SIL OFL).
 
 ## Modules
 
@@ -38,10 +40,10 @@ they will implement `HealthRepository` so no screen changes when real telemetry 
 
 ## Component library (`:ui/components`)
 
-`GlowCard`, `ZeppArcDial`, `RadialGauge`, `SegmentedRing`, `CountdownRing`, `PulsingDot`,
+`SoftCard`, `ZeppArcDial`, `RadialGauge`, `SegmentedRing`, `CountdownRing`, `PulsingDot`,
 `BeatingHeart`, `Sparkline`, `ScrubbableLineChart` (Catmull-Rom → cubic Bézier, drag scrubbing with
 haptic ticks), `DistributionBar`, `BarStrip`, `SegmentedControl`, `UnitToggle`, `NumberField`,
-`StatTile`, `Pill`, `DeltaBadge`, `GradientButton`.
+`StatTile`, `Pill`, `DeltaBadge`, `PrimaryButton`, `TonalButton`.
 
 ## Building
 

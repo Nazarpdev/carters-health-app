@@ -44,7 +44,7 @@ import com.carters.health.data.model.format0
 import com.carters.health.data.repo.HealthRepository
 import com.carters.health.ui.components.ChartSeries
 import com.carters.health.ui.components.Eyebrow
-import com.carters.health.ui.components.GlowCard
+import com.carters.health.ui.components.SoftCard
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.components.ScrubbableLineChart
 import com.carters.health.ui.components.SectionHeader
@@ -73,9 +73,9 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
     ) {
         item {
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                StatTile("Volume", compactVolume(Units.displayWeight(totals.totalVolumeLbs, unit)), unit = unit.label, accent = HealthColors.Gold, glow = true, compact = true, modifier = Modifier.weight(1f))
-                StatTile("Workouts", totals.totalWorkouts.toString(), accent = HealthColors.Emerald, compact = true, modifier = Modifier.weight(1f))
-                StatTile("Sets", totals.totalSets.toDouble().format0(), accent = HealthColors.Coral, compact = true, modifier = Modifier.weight(1f))
+                StatTile("Volume", compactVolume(Units.displayWeight(totals.totalVolumeLbs, unit)), unit = unit.label, accent = HealthColors.Green, tinted = true, compact = true, modifier = Modifier.weight(1f))
+                StatTile("Workouts", totals.totalWorkouts.toString(), accent = HealthColors.Green, compact = true, modifier = Modifier.weight(1f))
+                StatTile("Sets", totals.totalSets.toDouble().format0(), accent = HealthColors.Terracotta, compact = true, modifier = Modifier.weight(1f))
             }
         }
         item {
@@ -85,7 +85,7 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                 items(trackable, key = { it.id }) { ex ->
                     val on = ex == selected
-                    Pill(ex.name, color = if (on) HealthColors.Amber else HealthColors.Clay, filled = on) { haptics.tick(); selected = ex }
+                    Pill(ex.name, color = if (on) HealthColors.Green else HealthColors.Muted, filled = on) { haptics.tick(); selected = ex }
                 }
             }
         }
@@ -101,9 +101,9 @@ fun AnalyticsTab(repository: HealthRepository, unit: WeightUnit, modifier: Modif
                 SectionHeader("All-time PRs", subtitle = selected?.name ?: "")
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    PrCard("Max weight", formatWeight(maxW, unit), unit.label, HealthColors.Gold, Modifier.weight(1f))
-                    PrCard("Max est. 1RM", formatWeight(max1rm, unit), unit.label, HealthColors.Coral, Modifier.weight(1f))
-                    PrCard("Max volume set", Units.displayWeight(maxVol, unit).format0(), unit.label, HealthColors.Mint, Modifier.weight(1f))
+                    PrCard("Max weight", formatWeight(maxW, unit), unit.label, HealthColors.Green, Modifier.weight(1f))
+                    PrCard("Max est. 1RM", formatWeight(max1rm, unit), unit.label, HealthColors.Green, Modifier.weight(1f))
+                    PrCard("Max volume set", Units.displayWeight(maxVol, unit).format0(), unit.label, HealthColors.Green, Modifier.weight(1f))
                 }
             }
         }
@@ -120,28 +120,28 @@ private fun compactVolume(v: Double): String = when {
 
 @Composable
 private fun OverloadChartCard(exercise: Exercise?, curve: List<com.carters.health.data.model.OverloadPoint>, unit: WeightUnit, fmt: DateTimeFormatter) {
-    GlowCard(accent = HealthColors.Amber, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Eyebrow(exercise?.name ?: "Select an exercise", HealthColors.Amber)
+                Eyebrow(exercise?.name ?: "Select an exercise", HealthColors.Green)
                 if (curve.isNotEmpty()) {
                     val first = curve.first().estimatedOneRepMax
                     val last = curve.last().estimatedOneRepMax
                     Text(
                         "+${formatWeight(last - first, unit)} ${unit.label} est. 1RM over ${curve.size} sessions",
-                        style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay,
+                        style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted,
                     )
                 }
             }
-            LegendDot(HealthColors.Amber, "Est. 1RM")
+            LegendDot(HealthColors.Green, "Est. 1RM")
             Spacer(Modifier.width(10.dp))
-            LegendDot(HealthColors.Mint, "Heaviest")
+            LegendDot(HealthColors.Sage, "Heaviest")
         }
         Spacer(Modifier.height(8.dp))
         ScrubbableLineChart(
             series = listOf(
-                ChartSeries(curve.map { Units.displayWeight(it.estimatedOneRepMax, unit).toFloat() }, HealthColors.Amber, listOf(HealthColors.Amber, HealthColors.Gold), label = "Est. 1RM"),
-                ChartSeries(curve.map { Units.displayWeight(it.heaviestSetLbs, unit).toFloat() }, HealthColors.Mint, fill = false, dashed = true, label = "Heaviest"),
+                ChartSeries(curve.map { Units.displayWeight(it.estimatedOneRepMax, unit).toFloat() }, HealthColors.Green, label = "Est. 1RM"),
+                ChartSeries(curve.map { Units.displayWeight(it.heaviestSetLbs, unit).toFloat() }, HealthColors.Sage, fill = false, dashed = true, label = "Heaviest"),
             ),
             modifier = Modifier.fillMaxWidth().height(230.dp),
             xLabel = { i -> curve.getOrNull(i)?.date?.format(fmt) ?: "" },
@@ -157,33 +157,33 @@ private fun LegendDot(color: Color, label: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Box(Modifier.size(8.dp).clip(CircleShape).background(color))
         Spacer(Modifier.width(4.dp))
-        Text(label, style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
     }
 }
 
 @Composable
 private fun PrCard(label: String, value: String, unit: String, accent: Color, modifier: Modifier = Modifier) {
-    GlowCard(modifier = modifier, accent = accent, glow = false, contentPadding = PaddingValues(12.dp)) {
+    SoftCard(modifier = modifier, accent = accent, contentPadding = PaddingValues(12.dp)) {
         Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
         Spacer(Modifier.height(6.dp))
-        Text(value, style = MaterialTheme.typography.titleLarge, color = HealthColors.OnSurface)
-        Text(unit, style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
+        Text(value, style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
+        Text(unit, style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
         Spacer(Modifier.height(4.dp))
-        Text(label, style = MaterialTheme.typography.bodySmall, color = HealthColors.Sand)
+        Text(label, style = MaterialTheme.typography.bodySmall, color = HealthColors.InkSoft)
     }
 }
 
 @Composable
 private fun HistoryCard(entry: WorkoutHistoryEntry, unit: WeightUnit) {
-    GlowCard(accent = HealthColors.Clay, glow = false, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(accent = HealthColors.Muted, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.History, contentDescription = null, tint = HealthColors.Clay, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.History, contentDescription = null, tint = HealthColors.Muted, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(8.dp))
             Column(Modifier.weight(1f)) {
-                Text(entry.name, style = MaterialTheme.typography.titleSmall, color = HealthColors.OnSurface)
-                Text("${entry.date.format(DateTimeFormatter.ofPattern("EEE, MMM d"))} · ${entry.durationMinutes} min", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                Text(entry.name, style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
+                Text("${entry.date.format(DateTimeFormatter.ofPattern("EEE, MMM d"))} · ${entry.durationMinutes} min", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             }
-            if (entry.prCount > 0) Pill("${entry.prCount} PR", color = HealthColors.Gold, filled = true, icon = Icons.Default.EmojiEvents)
+            if (entry.prCount > 0) Pill("${entry.prCount} PR", color = HealthColors.Green, icon = Icons.Default.EmojiEvents)
         }
         Spacer(Modifier.height(10.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -193,9 +193,9 @@ private fun HistoryCard(entry: WorkoutHistoryEntry, unit: WeightUnit) {
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.FitnessCenter, contentDescription = null, tint = HealthColors.ClayDim, modifier = Modifier.size(12.dp))
+            Icon(Icons.Default.FitnessCenter, contentDescription = null, tint = HealthColors.Faint, modifier = Modifier.size(12.dp))
             Spacer(Modifier.width(6.dp))
-            Text(entry.exerciseNames.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = HealthColors.ClayDim, maxLines = 1)
+            Text(entry.exerciseNames.joinToString(" · "), style = MaterialTheme.typography.bodySmall, color = HealthColors.Faint, maxLines = 1)
         }
     }
 }
@@ -204,6 +204,6 @@ private fun HistoryCard(entry: WorkoutHistoryEntry, unit: WeightUnit) {
 private fun MiniStat(label: String, value: String) {
     Column {
         Eyebrow(label)
-        Text(value, style = MaterialTheme.typography.titleSmall, color = HealthColors.Sand)
+        Text(value, style = MaterialTheme.typography.titleSmall, color = HealthColors.InkSoft)
     }
 }

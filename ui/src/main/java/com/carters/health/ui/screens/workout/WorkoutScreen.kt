@@ -55,11 +55,11 @@ fun WorkoutScreen(
     val library by repository.exercises.collectAsState()
     val haptics = LocalHealthHaptics.current
 
-    Column(modifier.fillMaxSize().background(HealthColors.Obsidian)) {
+    Column(modifier.fillMaxSize().background(HealthColors.Canvas)) {
         Row(Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("Strength Studio", style = MaterialTheme.typography.headlineMedium, color = HealthColors.OnSurface)
-                Text("Progressive overload, tracked to the rep.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                Text("Strength Studio", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
+                Text("Progressive overload, tracked to the rep.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             }
             UnitToggle(session.unit, { session.unit = it })
         }
@@ -69,7 +69,7 @@ fun WorkoutScreen(
             selected = mode.ordinal,
             onSelect = { haptics.tick(); mode = WorkoutMode.entries[it] },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-            accent = HealthColors.Amber,
+            accent = HealthColors.Green,
         )
         Spacer(Modifier.height(6.dp))
         AnimatedContent(
@@ -90,7 +90,7 @@ fun WorkoutScreen(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000, heightDp = 1400)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA, heightDp = 1400)
 @Composable
 private fun WorkoutPreview() {
     HealthTheme {

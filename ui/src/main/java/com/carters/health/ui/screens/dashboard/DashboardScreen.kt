@@ -1,7 +1,6 @@
 package com.carters.health.ui.screens.dashboard
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,8 +53,8 @@ import com.carters.health.ui.components.BeatingHeart
 import com.carters.health.ui.components.DeltaBadge
 import com.carters.health.ui.components.DialRing
 import com.carters.health.ui.components.Eyebrow
-import com.carters.health.ui.components.GlowCard
-import com.carters.health.ui.components.GradientButton
+import com.carters.health.ui.components.SoftCard
+import com.carters.health.ui.components.PrimaryButton
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.components.PulsingDot
 import com.carters.health.ui.components.RadialGauge
@@ -80,10 +78,10 @@ internal fun greetingFor(hour: Int, readiness: Int, strain: Double): Greeting {
         else -> "keep today light — your body is still rebuilding"
     }
     return when (hour) {
-        in 5..11 -> Greeting("Good morning", "$recoveryLine.", HealthColors.Gold)
-        in 12..16 -> Greeting("Good afternoon", if (strain < 8) "plenty of room left for strain today." else "$recoveryLine.", HealthColors.Amber)
-        in 17..20 -> Greeting("Good evening", if (strain >= 14) "big day — start winding down." else "$recoveryLine.", HealthColors.Coral)
-        else -> Greeting("Rest & recharge tonight", "dim the lights — deep sleep builds tomorrow's readiness.", HealthColors.Lavender)
+        in 5..11 -> Greeting("Good morning", "$recoveryLine.", HealthColors.Green)
+        in 12..16 -> Greeting("Good afternoon", if (strain < 8) "plenty of room left for strain today." else "$recoveryLine.", HealthColors.Green)
+        in 17..20 -> Greeting("Good evening", if (strain >= 14) "big day — start winding down." else "$recoveryLine.", HealthColors.Terracotta)
+        else -> Greeting("Rest & recharge tonight", "dim the lights — deep sleep builds tomorrow's readiness.", HealthColors.Sage)
     }
 }
 
@@ -106,7 +104,7 @@ fun DashboardScreen(
     val greeting = remember(hourOfDay, readiness) { greetingFor(hourOfDay, readiness.readinessPercent, readiness.strain) }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(HealthColors.Obsidian),
+        modifier = modifier.fillMaxSize().background(HealthColors.Canvas),
         contentPadding = PaddingValues(top = 16.dp, bottom = 120.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
@@ -146,10 +144,10 @@ fun DashboardScreen(
                     StepsCard(activity.steps, activity.stepGoal, activity.distanceKm, activity.activeCalories)
                 }
                 item {
-                    BaselineCard("Resting HR", rhr.current, "bpm", rhr.sevenDayAverage, lowerIsBetter = true, accent = HealthColors.Coral)
+                    BaselineCard("Resting HR", rhr.current, "bpm", rhr.sevenDayAverage, lowerIsBetter = true, accent = HealthColors.Terracotta)
                 }
                 item {
-                    BaselineCard("HRV", hrv.current, "ms", hrv.sevenDayAverage, lowerIsBetter = false, accent = HealthColors.Mint)
+                    BaselineCard("HRV", hrv.current, "ms", hrv.sevenDayAverage, lowerIsBetter = false, accent = HealthColors.Green)
                 }
             }
         }
@@ -160,10 +158,10 @@ fun DashboardScreen(
             }
         }
         item {
-            GradientButton(
+            PrimaryButton(
                 text = "Start Strength Workout",
                 icon = Icons.Default.FitnessCenter,
-                brush = HealthColors.sunrise,
+                color = HealthColors.Green,
                 modifier = edge.fillMaxWidth(),
                 onClick = onStartWorkout,
             )
@@ -174,22 +172,22 @@ fun DashboardScreen(
 /** Calories: active burn ring over total, warm amber. */
 @Composable
 private fun BurnTile(active: Int, total: Int, modifier: Modifier = Modifier) {
-    GlowCard(modifier = modifier, accent = HealthColors.Amber, glow = false, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(modifier = modifier, accent = HealthColors.Green, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = HealthColors.Amber, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.LocalFireDepartment, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Burn")
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadialGauge(progress = active / total.toFloat().coerceAtLeast(1f), modifier = Modifier.size(58.dp), colors = listOf(HealthColors.Amber, HealthColors.Gold), strokeWidth = 6.dp) {
-                Text("${(active * 100 / total.coerceAtLeast(1))}%", style = MaterialTheme.typography.labelSmall, color = HealthColors.Gold)
+            RadialGauge(progress = active / total.toFloat().coerceAtLeast(1f), modifier = Modifier.size(58.dp), colors = listOf(HealthColors.Green, HealthColors.Green), strokeWidth = 6.dp) {
+                Text("${(active * 100 / total.coerceAtLeast(1))}%", style = MaterialTheme.typography.labelSmall, color = HealthColors.Green)
             }
             Spacer(Modifier.width(10.dp))
             Column {
-                Text(active.toDouble().format0(), style = MaterialTheme.typography.titleLarge, color = HealthColors.OnSurface)
-                Text("active kcal", style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
-                Text("${total.toDouble().format0()} total", style = MaterialTheme.typography.bodySmall, color = HealthColors.ClayDim)
+                Text(active.toDouble().format0(), style = MaterialTheme.typography.titleLarge, color = HealthColors.Ink)
+                Text("active kcal", style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
+                Text("${total.toDouble().format0()} total", style = MaterialTheme.typography.bodySmall, color = HealthColors.Faint)
             }
         }
     }
@@ -205,17 +203,17 @@ private fun WindDownTile(hour: Int, lastSleepMinutes: Int, modifier: Modifier = 
         debt > 60 -> "Repay ${debt / 60}h ${debt % 60}m of sleep debt tonight."
         else -> "Rhythm is steady. Keep the routine."
     }
-    GlowCard(modifier = modifier, accent = HealthColors.Lavender, glow = false, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(modifier = modifier, accent = HealthColors.Sage, contentPadding = PaddingValues(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Bedtime, contentDescription = null, tint = HealthColors.Lavender, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Bedtime, contentDescription = null, tint = HealthColors.Sage, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Wind-down")
         }
         Spacer(Modifier.height(8.dp))
-        Text(bedtime, style = MaterialTheme.typography.titleLarge, color = HealthColors.OnSurface)
-        Text("target bedtime", style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
+        Text(bedtime, style = MaterialTheme.typography.titleLarge, color = HealthColors.Ink)
+        Text("target bedtime", style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
         Spacer(Modifier.height(6.dp))
-        Text(copy, style = MaterialTheme.typography.bodySmall, color = HealthColors.Lavender)
+        Text(copy, style = MaterialTheme.typography.bodySmall, color = HealthColors.Sage)
     }
 }
 
@@ -227,15 +225,12 @@ private fun GreetingHeader(greeting: Greeting, connected: Boolean, deviceName: S
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(HealthColors.Espresso)
-                    .border(1.dp, HealthColors.rim(greeting.accent), CircleShape)
+                    .background(HealthColors.tint(greeting.accent))
                     .padding(start = 14.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
             ) {
                 Text(greeting.title, style = MaterialTheme.typography.labelLarge, color = greeting.accent)
                 Spacer(Modifier.width(6.dp))
-                Box(
-                    Modifier.size(8.dp).clip(CircleShape).background(Brush.linearGradient(listOf(greeting.accent, greeting.accent.copy(alpha = 0.4f)))),
-                )
+                Box(Modifier.size(7.dp).clip(CircleShape).background(greeting.accent))
                 Spacer(Modifier.width(6.dp))
             }
             Spacer(Modifier.weight(1f))
@@ -243,24 +238,23 @@ private fun GreetingHeader(greeting: Greeting, connected: Boolean, deviceName: S
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .clip(CircleShape)
-                    .background(HealthColors.Espresso)
-                    .border(1.dp, HealthColors.Border, CircleShape)
+                    .background(HealthColors.Card)
                     .padding(start = 4.dp, end = 12.dp, top = 4.dp, bottom = 4.dp),
             ) {
-                PulsingDot(color = if (connected) HealthColors.Mint else HealthColors.ClayDim, size = 8.dp)
-                Icon(Icons.Default.Watch, contentDescription = "Watch", tint = HealthColors.Sand, modifier = Modifier.size(14.dp))
+                PulsingDot(color = if (connected) HealthColors.Green else HealthColors.Faint, size = 8.dp)
+                Icon(Icons.Default.Watch, contentDescription = "Watch", tint = HealthColors.InkSoft, modifier = Modifier.size(14.dp))
                 Spacer(Modifier.width(6.dp))
-                Icon(Icons.Default.BatteryChargingFull, contentDescription = null, tint = if (battery > 20) HealthColors.Emerald else HealthColors.Coral, modifier = Modifier.size(14.dp))
-                Text("$battery%", style = MaterialTheme.typography.labelMedium, color = HealthColors.Sand)
+                Icon(Icons.Default.BatteryChargingFull, contentDescription = null, tint = if (battery > 20) HealthColors.Green else HealthColors.Terracotta, modifier = Modifier.size(14.dp))
+                Text("$battery%", style = MaterialTheme.typography.labelMedium, color = HealthColors.InkSoft)
             }
         }
         Spacer(Modifier.height(12.dp))
         Text(
             greeting.body.replaceFirstChar { it.uppercase() },
-            style = MaterialTheme.typography.headlineSmall,
-            color = HealthColors.OnSurface,
+            style = MaterialTheme.typography.headlineMedium,
+            color = HealthColors.Ink,
         )
-        Text(deviceName, style = MaterialTheme.typography.bodySmall, color = HealthColors.ClayDim)
+        Text(deviceName, style = MaterialTheme.typography.bodySmall, color = HealthColors.Faint)
     }
 }
 
@@ -268,28 +262,28 @@ private fun GreetingHeader(greeting: Greeting, connected: Boolean, deviceName: S
 private fun PillarDialCard(readiness: com.carters.health.data.model.ReadinessSnapshot, modifier: Modifier = Modifier) {
     val sleepH = readiness.sleepDurationMinutes / 60
     val sleepM = readiness.sleepDurationMinutes % 60
-    GlowCard(modifier = modifier, accent = HealthColors.Emerald, contentPadding = PaddingValues(20.dp)) {
+    SoftCard(modifier = modifier, accent = HealthColors.Green, contentPadding = PaddingValues(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             ZeppArcDial(
                 rings = listOf(
-                    DialRing(readiness.readinessPercent / 100f, listOf(HealthColors.Emerald, HealthColors.Mint), "Readiness"),
-                    DialRing((readiness.strain / 21.0).toFloat(), listOf(HealthColors.Amber, HealthColors.Gold), "Strain"),
-                    DialRing(readiness.sleepPerformancePercent / 100f, listOf(HealthColors.Violet, HealthColors.Lavender), "Sleep"),
+                    DialRing(readiness.readinessPercent / 100f, listOf(HealthColors.GreenDeep), "Readiness"),
+                    DialRing((readiness.strain / 21.0).toFloat(), listOf(HealthColors.Terracotta), "Strain"),
+                    DialRing(readiness.sleepPerformancePercent / 100f, listOf(HealthColors.Sage), "Sleep"),
                 ),
                 modifier = Modifier.size(172.dp),
                 strokeWidth = 11.dp,
                 gap = 6.dp,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${readiness.readinessPercent}", style = MaterialTheme.typography.displaySmall, color = HealthColors.OnSurface, fontWeight = FontWeight.Bold)
-                    Eyebrow("Ready", HealthColors.Mint)
+                    Text("${readiness.readinessPercent}", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink)
+                    Eyebrow("Ready", HealthColors.Green)
                 }
             }
             Spacer(Modifier.width(18.dp))
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                PillarRow(HealthColors.Emerald, "Recovery", "${readiness.readinessPercent}%", "HRV ${readiness.hrvMs} ms")
-                PillarRow(HealthColors.Amber, "Strain", String.format("%.1f", readiness.strain), "of 21.0")
-                PillarRow(HealthColors.Lavender, "Sleep", "${readiness.sleepPerformancePercent}%", "${sleepH}h ${sleepM}m rest")
+                PillarRow(HealthColors.GreenDeep, "Recovery", "${readiness.readinessPercent}%", "HRV ${readiness.hrvMs} ms")
+                PillarRow(HealthColors.Terracotta, "Strain", String.format("%.1f", readiness.strain), "of 21.0")
+                PillarRow(HealthColors.Sage, "Sleep", "${readiness.sleepPerformancePercent}%", "${sleepH}h ${sleepM}m rest")
             }
         }
     }
@@ -303,9 +297,9 @@ private fun PillarRow(color: Color, label: String, value: String, support: Strin
         Column {
             Eyebrow(label)
             Row(verticalAlignment = Alignment.Bottom) {
-                Text(value, style = MaterialTheme.typography.titleLarge, color = HealthColors.OnSurface)
+                Text(value, style = MaterialTheme.typography.titleLarge, color = HealthColors.Ink)
                 Spacer(Modifier.width(6.dp))
-                Text(support, style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 2.dp))
+                Text(support, style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 2.dp))
             }
         }
     }
@@ -318,34 +312,34 @@ private fun LiveBiometricsStrip(bpm: Int, sparkline: List<Float>, modifier: Modi
     LaunchedEffect(spotCheck) {
         if (spotCheck != null) { delay(2600); spotCheck = null }
     }
-    GlowCard(modifier = modifier, accent = HealthColors.Coral, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(modifier = modifier, accent = HealthColors.Terracotta, contentPadding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BeatingHeart(bpm = bpm.coerceAtLeast(40), size = 30.dp)
             Spacer(Modifier.width(12.dp))
             Column {
-                Eyebrow("Live heart rate", HealthColors.Coral)
+                Eyebrow("Live heart rate", HealthColors.Terracotta)
                 Row(verticalAlignment = Alignment.Bottom) {
-                    Text("$bpm", style = MaterialTheme.typography.displaySmall, color = HealthColors.OnSurface, fontWeight = FontWeight.Bold)
+                    Text("$bpm", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink)
                     Spacer(Modifier.width(4.dp))
-                    Text("bpm", style = MaterialTheme.typography.labelLarge, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 6.dp))
+                    Text("bpm", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 6.dp))
                 }
             }
             Spacer(Modifier.width(12.dp))
-            Sparkline(sparkline, Modifier.weight(1f).height(52.dp), color = HealthColors.Coral)
+            Sparkline(sparkline, Modifier.weight(1f).height(52.dp), color = HealthColors.Terracotta)
         }
         Spacer(Modifier.height(14.dp))
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             SpotCheckButton(
                 label = if (spotCheck == "spo2") "Measuring…" else "Spot SpO₂",
                 icon = Icons.Default.Bloodtype,
-                accent = HealthColors.Mint,
+                accent = HealthColors.Green,
                 active = spotCheck == "spo2",
                 modifier = Modifier.weight(1f),
             ) { haptics.confirm(); spotCheck = "spo2" }
             SpotCheckButton(
                 label = if (spotCheck == "stress") "Measuring…" else "Spot Stress",
                 icon = Icons.Default.Psychology,
-                accent = HealthColors.Lavender,
+                accent = HealthColors.Sage,
                 active = spotCheck == "stress",
                 modifier = Modifier.weight(1f),
             ) { haptics.confirm(); spotCheck = "stress" }
@@ -359,8 +353,7 @@ private fun SpotCheckButton(label: String, icon: androidx.compose.ui.graphics.ve
     Row(
         modifier = modifier
             .clip(shape)
-            .background(if (active) accent.copy(alpha = 0.18f) else HealthColors.SurfaceHigh.copy(alpha = 0.6f))
-            .border(1.dp, accent.copy(alpha = if (active) 0.7f else 0.3f), shape)
+            .background(if (active) HealthColors.tint(accent) else HealthColors.Field)
             .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -368,52 +361,52 @@ private fun SpotCheckButton(label: String, icon: androidx.compose.ui.graphics.ve
     ) {
         if (active) PulsingDot(accent, 6.dp) else Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
         Spacer(Modifier.width(6.dp))
-        Text(label, style = MaterialTheme.typography.labelLarge, color = if (active) accent else HealthColors.Sand)
+        Text(label, style = MaterialTheme.typography.labelLarge, color = if (active) accent else HealthColors.InkSoft)
     }
 }
 
 @Composable
 private fun WeightCard(weightLbs: Double, delta: Double, source: String, recent: List<Float>, onClick: () -> Unit) {
-    GlowCard(modifier = Modifier.width(210.dp), accent = HealthColors.Amber, contentPadding = PaddingValues(16.dp), onClick = onClick) {
+    SoftCard(modifier = Modifier.width(210.dp), accent = HealthColors.Green, contentPadding = PaddingValues(16.dp), onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Amber, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Body weight")
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.Bottom) {
-            Text(String.format("%.1f", weightLbs), style = MaterialTheme.typography.headlineMedium, color = HealthColors.OnSurface)
+            Text(String.format("%.1f", weightLbs), style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
             Spacer(Modifier.width(4.dp))
-            Text("lbs", style = MaterialTheme.typography.labelLarge, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 4.dp))
+            Text("lbs", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 4.dp))
         }
         Spacer(Modifier.height(6.dp))
         DeltaBadge(delta, "lbs", lowerIsBetter = true, suffix = " · 30D")
         Spacer(Modifier.height(10.dp))
-        Sparkline(recent, Modifier.fillMaxWidth().height(34.dp), color = HealthColors.Gold, showEndDot = false)
+        Sparkline(recent, Modifier.fillMaxWidth().height(34.dp), color = HealthColors.Green, showEndDot = false)
         Spacer(Modifier.height(8.dp))
-        Pill(source, color = HealthColors.Gold)
+        Pill(source, color = HealthColors.Green)
     }
 }
 
 @Composable
 private fun StepsCard(steps: Int, goal: Int, km: Double, activeKcal: Int) {
-    GlowCard(modifier = Modifier.width(236.dp), accent = HealthColors.Gold, glow = false, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(modifier = Modifier.width(236.dp), accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.DirectionsWalk, contentDescription = null, tint = HealthColors.Gold, modifier = Modifier.size(16.dp))
+            Icon(Icons.Default.DirectionsWalk, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
             Eyebrow("Daily steps")
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             SegmentedRing(progress = steps / goal.toFloat(), modifier = Modifier.size(78.dp), strokeWidth = 7.dp) {
-                Text("${(steps * 100 / goal)}%", style = MaterialTheme.typography.labelLarge, color = HealthColors.OnSurface)
+                Text("${(steps * 100 / goal)}%", style = MaterialTheme.typography.labelLarge, color = HealthColors.Ink)
             }
             Spacer(Modifier.width(12.dp))
             Column {
-                Text(steps.toDouble().format0(), style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
-                Text("of ${goal.toDouble().format0()}", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                Text(steps.toDouble().format0(), style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
+                Text("of ${goal.toDouble().format0()}", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                 Spacer(Modifier.height(6.dp))
-                Text(String.format("%.1f km · %d kcal", km, activeKcal), style = MaterialTheme.typography.labelMedium, color = HealthColors.Gold)
+                Text(String.format("%.1f km · %d kcal", km, activeKcal), style = MaterialTheme.typography.labelMedium, color = HealthColors.Green)
             }
         }
     }
@@ -421,7 +414,7 @@ private fun StepsCard(steps: Int, goal: Int, km: Double, activeKcal: Int) {
 
 @Composable
 private fun BaselineCard(label: String, current: Int, unit: String, baseline: Double, lowerIsBetter: Boolean, accent: Color) {
-    GlowCard(modifier = Modifier.width(170.dp), accent = accent, glow = false, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(modifier = Modifier.width(170.dp), accent = accent, contentPadding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.MonitorHeart, contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
             Spacer(Modifier.width(6.dp))
@@ -429,18 +422,18 @@ private fun BaselineCard(label: String, current: Int, unit: String, baseline: Do
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.Bottom) {
-            Text("$current", style = MaterialTheme.typography.headlineMedium, color = HealthColors.OnSurface)
+            Text("$current", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
             Spacer(Modifier.width(4.dp))
-            Text(unit, style = MaterialTheme.typography.labelLarge, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 4.dp))
+            Text(unit, style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 4.dp))
         }
         Spacer(Modifier.height(6.dp))
         DeltaBadge(current - baseline, unit, lowerIsBetter = lowerIsBetter, suffix = " · 7D")
         Spacer(Modifier.height(6.dp))
-        Text("7-day avg ${String.format("%.1f", baseline)}", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+        Text("7-day avg ${String.format("%.1f", baseline)}", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000, heightDp = 1200)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA, heightDp = 1200)
 @Composable
 private fun DashboardPreview() {
     HealthTheme {

@@ -8,7 +8,6 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -62,8 +61,8 @@ import com.carters.health.data.repo.SampleData
 import com.carters.health.ui.components.ChartSeries
 import com.carters.health.ui.components.DeltaBadge
 import com.carters.health.ui.components.Eyebrow
-import com.carters.health.ui.components.GlowCard
-import com.carters.health.ui.components.GradientButton
+import com.carters.health.ui.components.SoftCard
+import com.carters.health.ui.components.PrimaryButton
 import com.carters.health.ui.components.NumberField
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.components.PulsingDot
@@ -109,20 +108,20 @@ fun WeightTrendScreen(
     LaunchedEffect(scanning) { if (scanning) { delay(4000); scanning = false } }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(HealthColors.Obsidian),
+        modifier = modifier.fillMaxSize().background(HealthColors.Canvas),
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 120.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    Icons.Default.ArrowBack, contentDescription = "Back", tint = HealthColors.Sand,
+                    Icons.Default.ArrowBack, contentDescription = "Back", tint = HealthColors.InkSoft,
                     modifier = Modifier.clip(CircleShape).clickable(onClick = onBack).padding(6.dp),
                 )
                 Spacer(Modifier.width(6.dp))
                 Column(Modifier.weight(1f)) {
-                    Text("Weight & body", style = MaterialTheme.typography.headlineMedium, color = HealthColors.OnSurface)
-                    Text("Fitbit Aria + BLE scale, unified", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                    Text("Weight & body", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
+                    Text("Fitbit Aria + BLE scale, unified", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                 }
                 UnitToggle(unit, { unit = it })
             }
@@ -131,21 +130,21 @@ fun WeightTrendScreen(
             HeroWeightCard(latest, unit, latest?.weightLbs?.minus(baseline30) ?: 0.0, timeFmt)
         }
         item {
-            GlowCard(accent = HealthColors.Gold, glow = false, contentPadding = PaddingValues(16.dp)) {
+            SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Column(Modifier.weight(1f)) {
-                        Eyebrow("Trend", HealthColors.Gold)
-                        Text("${window.size} weigh-ins", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                        Eyebrow("Trend", HealthColors.Green)
+                        Text("${window.size} weigh-ins", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
                     }
                     SegmentedControl(
                         Timeframe.entries.map { it.label }, timeframe.ordinal, { haptics.tick(); timeframe = Timeframe.entries[it] },
-                        Modifier.width(200.dp), accent = HealthColors.Gold, height = 32.dp,
+                        Modifier.width(200.dp), accent = HealthColors.Green, height = 32.dp,
                     )
                 }
                 Spacer(Modifier.height(8.dp))
                 val fmt = if (timeframe == Timeframe.D7) DateTimeFormatter.ofPattern("EEE") else DateTimeFormatter.ofPattern("MMM d")
                 ScrubbableLineChart(
-                    series = listOf(ChartSeries(window.map { Units.displayWeight(it.weightLbs, unit).toFloat() }, HealthColors.Amber, listOf(HealthColors.Amber, HealthColors.Gold))),
+                    series = listOf(ChartSeries(window.map { Units.displayWeight(it.weightLbs, unit).toFloat() }, HealthColors.Green, listOf(HealthColors.Green, HealthColors.Green))),
                     modifier = Modifier.fillMaxWidth().height(230.dp),
                     baseline = Units.displayWeight(baseline30, unit).toFloat(),
                     xLabel = { i -> window.getOrNull(i)?.time?.format(fmt) ?: "" },
@@ -162,12 +161,12 @@ fun WeightTrendScreen(
             item {
                 Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                     Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        CompositionTile("Body fat", String.format("%.1f", composition.bodyFatPercent), "%", composition.bodyFatCategory, HealthColors.Coral, Modifier.weight(1f))
-                        CompositionTile("BMI", String.format("%.1f", composition.bmi), "", composition.bmiCategory, HealthColors.Mint, Modifier.weight(1f))
+                        CompositionTile("Body fat", String.format("%.1f", composition.bodyFatPercent), "%", composition.bodyFatCategory, HealthColors.Green, Modifier.weight(1f))
+                        CompositionTile("BMI", String.format("%.1f", composition.bmi), "", composition.bmiCategory, HealthColors.Green, Modifier.weight(1f))
                     }
                     CompositionTile(
                         "Lean body mass", String.format("%.1f", Units.displayWeight(composition.leanMassLbs, unit)), unit.label,
-                        "muscle · bone · water", HealthColors.Lavender, Modifier.fillMaxWidth(),
+                        "muscle · bone · water", HealthColors.Sage, Modifier.fillMaxWidth(),
                         support = "${String.format("%.1f", 100 - composition.bodyFatPercent)}% of body weight is lean tissue",
                     )
                 }
@@ -178,7 +177,7 @@ fun WeightTrendScreen(
             ScaleSyncCard(scanning) { haptics.confirm(); scanning = true }
         }
         item {
-            GradientButton("Log Weight", icon = Icons.Default.Add, brush = HealthColors.amberGold, modifier = Modifier.fillMaxWidth()) { showLog = true }
+            PrimaryButton("Log Weight", icon = Icons.Default.Add, color = HealthColors.Green, modifier = Modifier.fillMaxWidth()) { showLog = true }
         }
         item { SectionHeader("Weigh-in history", subtitle = "${sorted.size} entries") }
         items(sorted.asReversed().take(30).size, key = { sorted.asReversed()[it].id }) { i ->
@@ -199,76 +198,76 @@ fun WeightTrendScreen(
 
 @Composable
 private fun HeroWeightCard(latest: WeightEntry?, unit: WeightUnit, delta: Double, fmt: DateTimeFormatter) {
-    GlowCard(accent = HealthColors.Amber, contentPadding = PaddingValues(22.dp)) {
+    SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(22.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Amber, modifier = Modifier.size(18.dp))
+            Icon(Icons.Default.Scale, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(18.dp))
             Spacer(Modifier.width(6.dp))
-            Eyebrow("Current weight", HealthColors.Amber)
+            Eyebrow("Current weight", HealthColors.Green)
         }
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.Bottom) {
             Text(
                 String.format("%.1f", Units.displayWeight(latest?.weightLbs ?: 0.0, unit)),
-                style = MaterialTheme.typography.displayLarge, color = HealthColors.OnSurface, fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.displayLarge, color = HealthColors.Ink,
             )
             Spacer(Modifier.width(8.dp))
-            Text(unit.label, style = MaterialTheme.typography.titleLarge, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 10.dp))
+            Text(unit.label, style = MaterialTheme.typography.titleLarge, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 10.dp))
         }
         Spacer(Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             DeltaBadge(Units.displayWeight(delta, unit), unit.label, lowerIsBetter = true, suffix = " vs 30D")
-            if (latest != null) Pill(latest.source.name, color = if (latest.source == WeightSource.BLE_SCALE) HealthColors.Mint else HealthColors.Gold, filled = true)
+            if (latest != null) Pill(latest.source.label, color = HealthColors.Green)
         }
         Spacer(Modifier.height(10.dp))
         Text(
             if (latest != null) "Last synced ${latest.time.format(fmt)}" else "No readings yet",
-            style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay,
+            style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted,
         )
     }
 }
 
 @Composable
 private fun CompositionTile(label: String, value: String, unit: String, category: String, accent: Color, modifier: Modifier = Modifier, support: String? = null) {
-    GlowCard(modifier = modifier, accent = accent, glow = false, contentPadding = PaddingValues(14.dp)) {
+    SoftCard(modifier = modifier, accent = accent, contentPadding = PaddingValues(14.dp)) {
         Eyebrow(label)
         Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.Bottom) {
-            Text(value, style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
-            if (unit.isNotEmpty()) { Spacer(Modifier.width(3.dp)); Text(unit, style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 4.dp)) }
+            Text(value, style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
+            if (unit.isNotEmpty()) { Spacer(Modifier.width(3.dp)); Text(unit, style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 4.dp)) }
             if (support != null) {
                 Spacer(Modifier.weight(1f))
-                Text(support, style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay, modifier = Modifier.padding(bottom = 3.dp))
+                Text(support, style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 3.dp))
             }
         }
         Spacer(Modifier.height(8.dp))
-        Pill(category, color = accent, filled = true)
+        Pill(category, color = accent)
     }
 }
 
 @Composable
 private fun ScaleSyncCard(scanning: Boolean, onScan: () -> Unit) {
-    GlowCard(accent = HealthColors.Emerald, glow = scanning, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(accent = HealthColors.Green, tinted = scanning, contentPadding = PaddingValues(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadarBeacon(active = scanning, modifier = Modifier.size(64.dp))
             Spacer(Modifier.width(14.dp))
             Column(Modifier.weight(1f)) {
-                Text(if (scanning) "Scanning for scales…" else "Connect Scale", style = MaterialTheme.typography.titleMedium, color = HealthColors.OnSurface)
+                Text(if (scanning) "Scanning for scales…" else "Connect Scale", style = MaterialTheme.typography.titleMedium, color = HealthColors.Ink)
                 Text(
                     if (scanning) "Step on the scale to broadcast a reading (GATT 0x181D)" else "Pair a Bluetooth smart scale for automatic weigh-ins",
-                    style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay,
+                    style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted,
                 )
                 Spacer(Modifier.height(10.dp))
                 Row(
                     Modifier
                         .clip(RoundedCornerShape(12.dp))
-                        .background(HealthColors.emeraldMint)
+                        .background(HealthColors.Green)
                         .clickable(enabled = !scanning, onClick = onScan)
                         .padding(horizontal = 14.dp, vertical = 9.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(if (scanning) Icons.Default.BluetoothSearching else Icons.Default.Bluetooth, contentDescription = null, tint = HealthColors.Obsidian, modifier = Modifier.size(16.dp))
+                    Icon(if (scanning) Icons.Default.BluetoothSearching else Icons.Default.Bluetooth, contentDescription = null, tint = HealthColors.Card, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(if (scanning) "Listening" else "Scan", style = MaterialTheme.typography.labelLarge, color = HealthColors.Obsidian, fontWeight = FontWeight.Bold)
+                    Text(if (scanning) "Listening" else "Scan", style = MaterialTheme.typography.labelLarge, color = HealthColors.Card)
                 }
             }
         }
@@ -287,14 +286,13 @@ private fun RadarBeacon(active: Boolean, modifier: Modifier = Modifier) {
             if (active) {
                 for (k in 0 until 3) {
                     val p = ((sweep + k / 3f) % 1f)
-                    drawCircle(HealthColors.Mint.copy(alpha = (1 - p) * 0.5f), r * p, c, style = Stroke(2.dp.toPx()))
+                    drawCircle(HealthColors.Green.copy(alpha = (1 - p) * 0.5f), r * p, c, style = Stroke(2.dp.toPx()))
                 }
             } else {
-                drawCircle(HealthColors.Emerald.copy(alpha = 0.12f), r, c)
-                drawCircle(HealthColors.Emerald.copy(alpha = 0.3f), r, c, style = Stroke(1.dp.toPx()))
+                drawCircle(HealthColors.GreenSoft, r, c)
             }
         }
-        if (active) PulsingDot(HealthColors.Mint, 10.dp) else Icon(Icons.Default.Bluetooth, contentDescription = null, tint = HealthColors.Emerald)
+        if (active) PulsingDot(HealthColors.Green, 10.dp) else Icon(Icons.Default.Bluetooth, contentDescription = null, tint = HealthColors.Green)
     }
 }
 
@@ -302,22 +300,22 @@ private fun RadarBeacon(active: Boolean, modifier: Modifier = Modifier) {
 private fun HistoryRow(entry: WeightEntry, previous: WeightEntry?, unit: WeightUnit) {
     val shape = RoundedCornerShape(14.dp)
     Row(
-        Modifier.fillMaxWidth().clip(shape).background(HealthColors.Espresso).border(1.dp, HealthColors.Border, shape).padding(horizontal = 14.dp, vertical = 12.dp),
+        Modifier.fillMaxWidth().clip(shape).background(HealthColors.Card).padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(entry.time.format(DateTimeFormatter.ofPattern("EEE, MMM d · h:mm a")), style = MaterialTheme.typography.titleSmall, color = HealthColors.Sand)
+            Text(entry.time.format(DateTimeFormatter.ofPattern("EEE, MMM d · h:mm a")), style = MaterialTheme.typography.titleSmall, color = HealthColors.InkSoft)
             Spacer(Modifier.height(4.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                Pill(entry.source.label, color = when (entry.source) { WeightSource.BLE_SCALE -> HealthColors.Mint; WeightSource.FITBIT_SCALE -> HealthColors.Gold; WeightSource.MANUAL -> HealthColors.Clay })
-                entry.bodyFatPercent?.let { Pill(String.format("%.1f%% fat", it), color = HealthColors.Coral) }
+                Pill(entry.source.label, color = if (entry.source == WeightSource.MANUAL) HealthColors.Muted else HealthColors.Green)
+                entry.bodyFatPercent?.let { Pill(String.format("%.1f%% fat", it), color = HealthColors.Muted) }
             }
         }
         Column(horizontalAlignment = Alignment.End) {
-            Text("${String.format("%.1f", Units.displayWeight(entry.weightLbs, unit))} ${unit.label}", style = MaterialTheme.typography.titleMedium, color = HealthColors.OnSurface)
+            Text("${String.format("%.1f", Units.displayWeight(entry.weightLbs, unit))} ${unit.label}", style = MaterialTheme.typography.titleMedium, color = HealthColors.Ink)
             if (previous != null) {
                 val d = Units.displayWeight(entry.weightLbs - previous.weightLbs, unit)
-                Text(String.format("%+.1f", d), style = MaterialTheme.typography.labelSmall, color = if (d <= 0) HealthColors.Emerald else HealthColors.Coral)
+                Text(String.format("%+.1f", d), style = MaterialTheme.typography.labelSmall, color = if (d <= 0) HealthColors.Green else HealthColors.Terracotta)
             }
         }
     }
@@ -328,9 +326,9 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
     var weight by remember { mutableStateOf("") }
     var fat by remember { mutableStateOf("") }
     Dialog(onDismissRequest = onDismiss) {
-        GlowCard(accent = HealthColors.Amber, contentPadding = PaddingValues(20.dp)) {
-            Text("Manual weigh-in", style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
-            Text(LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMM d · h:mm a")), style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+        SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(20.dp)) {
+            Text("Manual weigh-in", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
+            Text(LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMM d · h:mm a")), style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             Spacer(Modifier.height(16.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Column(Modifier.weight(1f)) {
@@ -341,15 +339,15 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
                 Column(Modifier.weight(1f)) {
                     Eyebrow("Body fat %")
                     Spacer(Modifier.height(6.dp))
-                    NumberField(fat, { fat = it }, Modifier.fillMaxWidth(), placeholder = "optional", accent = HealthColors.Coral)
+                    NumberField(fat, { fat = it }, Modifier.fillMaxWidth(), placeholder = "optional", accent = HealthColors.Terracotta)
                 }
             }
             Spacer(Modifier.height(18.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Cancel", style = MaterialTheme.typography.labelLarge, color = HealthColors.Clay, modifier = Modifier.clickable(onClick = onDismiss).padding(8.dp))
+                Text("Cancel", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.clickable(onClick = onDismiss).padding(8.dp))
                 Spacer(Modifier.width(8.dp))
-                GradientButton("Save", modifier = Modifier.weight(1f), height = 46.dp) {
-                    val w = weight.toDoubleOrNull() ?: return@GradientButton
+                PrimaryButton("Save", modifier = Modifier.weight(1f), height = 46.dp) {
+                    val w = weight.toDoubleOrNull() ?: return@PrimaryButton
                     onSave(Units.toLbs(w, unit), fat.toDoubleOrNull())
                 }
             }
@@ -357,7 +355,7 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000, heightDp = 1400)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA, heightDp = 1400)
 @Composable
 private fun WeightPreview() {
     HealthTheme { WeightTrendScreen(InMemoryHealthRepository(), onBack = {}) }

@@ -60,14 +60,12 @@ fun DrawScope.drawGlowArc(
     stroke: Float,
     progress: Float,
     colors: List<Color>,
-    trackAlpha: Float = 0.12f,
-    glow: Boolean = true,
 ) {
     val topLeft = Offset(center.x - radius, center.y - radius)
     val size = Size(radius * 2, radius * 2)
     // track
     drawArc(
-        color = colors.last().copy(alpha = trackAlpha),
+        color = HealthColors.Field,
         startAngle = ARC_START,
         sweepAngle = ARC_SWEEP,
         useCenter = false,
@@ -77,39 +75,15 @@ fun DrawScope.drawGlowArc(
     )
     val sweep = (ARC_SWEEP * progress.coerceIn(0f, 1f))
     if (sweep <= 0.5f) return
-    val brush = Brush.sweepGradient(
-        colorStops = arrayOf(0f to colors.first(), 0.75f to colors.last(), 1f to colors.first()),
-        center = center,
+    drawArc(
+        color = colors.first(),
+        startAngle = ARC_START,
+        sweepAngle = sweep,
+        useCenter = false,
+        topLeft = topLeft,
+        size = size,
+        style = Stroke(stroke, cap = StrokeCap.Round),
     )
-    rotate(ARC_START, pivot = center) {
-        if (glow) {
-            drawArc(
-                brush = Brush.sweepGradient(
-                    colorStops = arrayOf(0f to colors.first().copy(alpha = 0.0f), 0.75f to colors.last().copy(alpha = 0.35f), 1f to colors.first().copy(alpha = 0f)),
-                    center = center,
-                ),
-                startAngle = 0f,
-                sweepAngle = sweep,
-                useCenter = false,
-                topLeft = topLeft,
-                size = size,
-                style = Stroke(stroke * 2.2f, cap = StrokeCap.Round),
-            )
-        }
-        drawArc(
-            brush = brush,
-            startAngle = 0f,
-            sweepAngle = sweep,
-            useCenter = false,
-            topLeft = topLeft,
-            size = size,
-            style = Stroke(stroke, cap = StrokeCap.Round),
-        )
-        // bright tip
-        val tipAngle = sweep * PI / 180
-        val tip = Offset(center.x + radius * cos(tipAngle).toFloat(), center.y + radius * sin(tipAngle).toFloat())
-        drawCircle(Color.White.copy(alpha = 0.85f), radius = stroke * 0.28f, center = tip)
-    }
 }
 
 /**
@@ -132,7 +106,7 @@ fun ZeppArcDial(
             val c = Offset(size.width / 2, size.height / 2)
             var radius = (size.minDimension / 2) - stroke
             rings.forEachIndexed { i, ring ->
-                drawGlowArc(c, radius, stroke, animated[i].value, ring.colors, glow = i == 0)
+                drawGlowArc(c, radius, stroke, animated[i].value, ring.colors)
                 radius -= step
             }
         }
@@ -145,7 +119,7 @@ fun ZeppArcDial(
 fun RadialGauge(
     progress: Float,
     modifier: Modifier = Modifier,
-    colors: List<Color> = listOf(HealthColors.Emerald, HealthColors.Mint),
+    colors: List<Color> = listOf(HealthColors.Green, HealthColors.Green),
     strokeWidth: Dp = 12.dp,
     center: @Composable () -> Unit,
 ) {
@@ -167,7 +141,7 @@ fun SegmentedRing(
     progress: Float,
     modifier: Modifier = Modifier,
     segments: Int = 10,
-    colors: List<Color> = listOf(HealthColors.Amber, HealthColors.Gold),
+    colors: List<Color> = listOf(HealthColors.Green, HealthColors.Green),
     strokeWidth: Dp = 10.dp,
     center: @Composable () -> Unit = {},
 ) {
@@ -184,14 +158,14 @@ fun SegmentedRing(
                 val start = -90f + i * (segDeg + gapDeg)
                 val portion = (filled - i).coerceIn(0f, 1f)
                 drawArc(
-                    color = colors.last().copy(alpha = 0.14f),
+                    color = HealthColors.Field,
                     startAngle = start, sweepAngle = segDeg, useCenter = false,
                     topLeft = Offset(c.x - radius, c.y - radius), size = Size(radius * 2, radius * 2),
                     style = Stroke(stroke, cap = StrokeCap.Round),
                 )
                 if (portion > 0f) {
                     drawArc(
-                        brush = Brush.linearGradient(colors),
+                        color = colors.first(),
                         startAngle = start, sweepAngle = segDeg * portion, useCenter = false,
                         topLeft = Offset(c.x - radius, c.y - radius), size = Size(radius * 2, radius * 2),
                         style = Stroke(stroke, cap = StrokeCap.Round),
@@ -212,7 +186,7 @@ fun CountdownRing(
     fraction: Float,          // remaining 0..1
     running: Boolean,
     modifier: Modifier = Modifier,
-    colors: List<Color> = listOf(HealthColors.Mint, HealthColors.Emerald),
+    colors: List<Color> = listOf(HealthColors.Green),
     strokeWidth: Dp = 10.dp,
     center: @Composable () -> Unit,
 ) {
@@ -228,17 +202,11 @@ fun CountdownRing(
             val stroke = strokeWidth.toPx()
             val radius = size.minDimension / 2 - stroke * 1.5f
             val c = Offset(size.width / 2, size.height / 2)
-            val alpha = if (running) pulse else 0.6f
-            drawCircle(colors.last().copy(alpha = 0.12f), radius, c, style = Stroke(stroke))
-            if (running) {
-                drawCircle(
-                    brush = Brush.radialGradient(listOf(colors.first().copy(alpha = 0.18f * pulse), Color.Transparent), c, radius * 1.15f),
-                    radius = radius * 1.15f, center = c,
-                )
-            }
+            val alpha = if (running) 0.7f + 0.3f * pulse else 0.6f
+            drawCircle(HealthColors.Card, radius, c, style = Stroke(stroke))
             val sweep = 360f * fraction.coerceIn(0f, 1f)
             drawArc(
-                brush = Brush.sweepGradient(colorStops = arrayOf(0f to colors.first(), 1f to colors.last()), center = c),
+                color = colors.first(),
                 startAngle = -90f, sweepAngle = sweep, useCenter = false,
                 topLeft = Offset(c.x - radius, c.y - radius), size = Size(radius * 2, radius * 2),
                 style = Stroke(stroke, cap = StrokeCap.Round), alpha = alpha,
@@ -250,7 +218,7 @@ fun CountdownRing(
 
 /** Pulsating beacon dot — watch connection status, live-stream indicator. */
 @Composable
-fun PulsingDot(color: Color = HealthColors.Mint, size: Dp = 10.dp, modifier: Modifier = Modifier) {
+fun PulsingDot(color: Color = HealthColors.Green, size: Dp = 10.dp, modifier: Modifier = Modifier) {
     val transition = rememberInfiniteTransition(label = "beacon")
     val ripple by transition.animateFloat(
         initialValue = 0f, targetValue = 1f,
@@ -261,13 +229,12 @@ fun PulsingDot(color: Color = HealthColors.Mint, size: Dp = 10.dp, modifier: Mod
         val r = size.toPx() / 2
         drawCircle(color.copy(alpha = (1f - ripple) * 0.5f), radius = r + r * 1.6f * ripple, center = c)
         drawCircle(color, radius = r, center = c)
-        drawCircle(Color.White.copy(alpha = 0.5f), radius = r * 0.4f, center = Offset(c.x - r * 0.25f, c.y - r * 0.25f))
     }
 }
 
 /** A heart that beats at the given BPM — scale keyframes shaped like a real systole/diastole. */
 @Composable
-fun BeatingHeart(bpm: Int, modifier: Modifier = Modifier, color: Color = HealthColors.Coral, size: Dp = 28.dp) {
+fun BeatingHeart(bpm: Int, modifier: Modifier = Modifier, color: Color = HealthColors.Terracotta, size: Dp = 28.dp) {
     val period = (60_000 / bpm.coerceIn(30, 220))
     val transition = rememberInfiniteTransition(label = "heart")
     val scale by transition.animateFloat(
@@ -294,31 +261,31 @@ fun BeatingHeart(bpm: Int, modifier: Modifier = Modifier, color: Color = HealthC
             cubicTo(w * 0.95f, h * 0.05f, w * 0.95f, h * 0.55f, w / 2, h * 0.9f)
             close()
         }
-        drawCircle(color.copy(alpha = 0.25f * (s - 1f) / 0.28f + 0.05f), radius = w * 0.7f * s, center = Offset(w / 2, h / 2))
+        drawCircle(HealthColors.TerracottaSoft, radius = w * 0.7f * s, center = Offset(w / 2, h / 2))
         scale(s, s, pivot = Offset(w / 2, h / 2)) {
-            drawPath(path, Brush.linearGradient(listOf(HealthColors.Rose, color)))
+            drawPath(path, color)
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA)
 @Composable
 private fun DialPreview() {
     HealthTheme {
         Column(Modifier.padding(24.dp)) {
             ZeppArcDial(
                 rings = listOf(
-                    DialRing(0.84f, listOf(HealthColors.Emerald, HealthColors.Mint), "Readiness"),
-                    DialRing(11.4f / 21f, listOf(HealthColors.Amber, HealthColors.Gold), "Strain"),
-                    DialRing(0.71f, listOf(HealthColors.Violet, HealthColors.Lavender), "Sleep"),
+                    DialRing(0.84f, listOf(HealthColors.Green, HealthColors.Green), "Readiness"),
+                    DialRing(11.4f / 21f, listOf(HealthColors.Green, HealthColors.Green), "Strain"),
+                    DialRing(0.71f, listOf(HealthColors.GreenDeep, HealthColors.Sage), "Sleep"),
                 ),
                 modifier = Modifier.size(220.dp),
             ) {
-                Text("84", style = MaterialTheme.typography.displayMedium, color = HealthColors.OnSurface)
+                Text("84", style = MaterialTheme.typography.displayMedium, color = HealthColors.Ink)
             }
             Spacer(Modifier.height(16.dp))
             CountdownRing(fraction = 0.6f, running = true, modifier = Modifier.size(120.dp)) {
-                Text("01:30", style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
+                Text("01:30", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             }
         }
     }

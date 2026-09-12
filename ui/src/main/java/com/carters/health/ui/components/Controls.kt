@@ -3,7 +3,6 @@ package com.carters.health.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -25,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -37,39 +35,38 @@ import androidx.compose.ui.unit.dp
 import com.carters.health.data.model.WeightUnit
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.LocalHealthHaptics
+import com.carters.health.ui.theme.SansFamily
 
 /** Two-segment lbs ↔ kg pill with a sliding thumb. */
 @Composable
-fun UnitToggle(unit: WeightUnit, onChange: (WeightUnit) -> Unit, modifier: Modifier = Modifier, accent: Color = HealthColors.Amber) {
+fun UnitToggle(unit: WeightUnit, onChange: (WeightUnit) -> Unit, modifier: Modifier = Modifier, accent: Color = HealthColors.Green) {
     val haptics = LocalHealthHaptics.current
     SegmentedControl(
-        options = WeightUnit.entries.map { it.label.uppercase() },
+        options = WeightUnit.entries.map { it.label },
         selected = unit.ordinal,
         onSelect = { haptics.tick(); onChange(WeightUnit.entries[it]) },
         modifier = modifier.width(96.dp),
         accent = accent,
-        height = 30.dp,
+        height = 32.dp,
     )
 }
 
-/** Generic segmented control with a springy sliding thumb; used for tabs, units and timeframes. */
+/** Segmented control: off-grey track, off-white thumb that springs between options. */
 @Composable
 fun SegmentedControl(
     options: List<String>,
     selected: Int,
     onSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    accent: Color = HealthColors.Amber,
+    accent: Color = HealthColors.Green,
     height: Dp = 40.dp,
-    thumbBrush: Brush? = null,
 ) {
     val shape = RoundedCornerShape(height / 2)
     BoxWithConstraints(
         modifier
             .height(height)
             .clip(shape)
-            .background(HealthColors.Espresso)
-            .border(1.dp, HealthColors.Border, shape)
+            .background(HealthColors.CardAlt)
             .padding(3.dp),
     ) {
         val segment = maxWidth / options.size
@@ -80,12 +77,11 @@ fun SegmentedControl(
                 .width(segment)
                 .fillMaxHeight()
                 .clip(CircleShape)
-                .background(thumbBrush ?: SolidColor(accent.copy(alpha = 0.22f)))
-                .border(1.dp, accent.copy(alpha = 0.6f), CircleShape),
+                .background(HealthColors.Card),
         )
         Row(Modifier.fillMaxWidth().fillMaxHeight()) {
             options.forEachIndexed { i, label ->
-                val color by animateColorAsState(if (i == selected) accent else HealthColors.Clay, label = "seg")
+                val color by animateColorAsState(if (i == selected) accent else HealthColors.Muted, label = "seg")
                 Box(
                     Modifier
                         .weight(1f)
@@ -108,7 +104,7 @@ fun NumberField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String = "—",
-    accent: Color = HealthColors.Amber,
+    accent: Color = HealthColors.Green,
     enabled: Boolean = true,
 ) {
     val shape = RoundedCornerShape(10.dp)
@@ -118,17 +114,16 @@ fun NumberField(
         modifier = modifier
             .height(38.dp)
             .clip(shape)
-            .background(if (enabled) HealthColors.SurfaceHigh else HealthColors.Espresso)
-            .border(1.dp, if (enabled) HealthColors.Border else Color.Transparent, shape),
+            .background(if (enabled) HealthColors.Field else Color.Transparent),
         enabled = enabled,
         singleLine = true,
-        textStyle = TextStyle(color = HealthColors.OnSurface, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
+        textStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Ink, fontWeight = FontWeight.SemiBold, textAlign = TextAlign.Center, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
         cursorBrush = SolidColor(accent),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
         decorationBox = { inner ->
             Box(Modifier.fillMaxWidth().fillMaxHeight(), contentAlignment = Alignment.Center) {
                 if (value.isEmpty()) {
-                    Text(placeholder, color = HealthColors.ClayDim, style = MaterialTheme.typography.bodyMedium)
+                    Text(placeholder, color = HealthColors.Faint, style = MaterialTheme.typography.bodyMedium)
                 }
                 inner()
             }

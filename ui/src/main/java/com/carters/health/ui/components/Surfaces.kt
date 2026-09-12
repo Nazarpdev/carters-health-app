@@ -1,7 +1,6 @@
 package com.carters.health.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -28,15 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -45,42 +38,26 @@ import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.HealthTheme
 
 /**
- * The signature surface: warm espresso card, 1px gradient rim light and a soft ambient glow
- * that pools underneath the card in the accent colour.
+ * The only card in the app: a flat, softly rounded off-white surface on the beige canvas.
+ * No borders, no gradients. [accent] is kept so callers can tint a card (`tinted = true`)
+ * when it should read as "active" (a running rest timer, a scanning radar).
  */
 @Composable
-fun GlowCard(
+fun SoftCard(
     modifier: Modifier = Modifier,
-    accent: Color = HealthColors.Amber,
-    glow: Boolean = true,
-    shape: Shape = RoundedCornerShape(24.dp),
-    container: Color = HealthColors.Espresso,
+    accent: Color = HealthColors.Green,
+    tinted: Boolean = false,
+    shape: Shape = RoundedCornerShape(22.dp),
+    container: Color = HealthColors.Card,
     contentPadding: PaddingValues = PaddingValues(20.dp),
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val corner = 24.dp
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .drawBehind {
-                if (glow) {
-                    val radius = size.width * 0.75f
-                    drawRoundRect(
-                        brush = Brush.radialGradient(
-                            colors = listOf(accent.copy(alpha = 0.22f), accent.copy(alpha = 0.05f), Color.Transparent),
-                            center = Offset(size.width * 0.5f, size.height * 0.95f),
-                            radius = radius,
-                        ),
-                        topLeft = Offset(-radius * 0.15f, 0f),
-                        size = Size(size.width + radius * 0.3f, size.height + radius * 0.35f),
-                        cornerRadius = CornerRadius(corner.toPx() * 2),
-                    )
-                }
-            }
             .clip(shape)
-            .background(container)
-            .border(1.dp, HealthColors.rim(accent), shape)
+            .background(if (tinted) HealthColors.tint(accent) else container)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(contentPadding),
         content = content,
@@ -100,9 +77,9 @@ fun SectionHeader(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, color = HealthColors.OnSurface)
+            Text(title, style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             if (subtitle != null) {
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             }
         }
         if (action != null) {
@@ -113,48 +90,49 @@ fun SectionHeader(
                     .clickable(enabled = onAction != null) { onAction?.invoke() }
                     .padding(start = 10.dp, top = 4.dp, bottom = 4.dp, end = 2.dp),
             ) {
-                Text(action, style = MaterialTheme.typography.labelLarge, color = HealthColors.Amber)
-                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = HealthColors.Amber, modifier = Modifier.size(18.dp))
+                Text(action, style = MaterialTheme.typography.labelLarge, color = HealthColors.Green)
+                Icon(Icons.Default.ChevronRight, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(18.dp))
             }
         }
     }
 }
 
-/** Small, capsule-shaped tag: muscle group, unit, source badge, category. */
+/** Small capsule tag: muscle group, unit, source badge, category. Flat tonal fill. */
 @Composable
 fun Pill(
     text: String,
     modifier: Modifier = Modifier,
-    color: Color = HealthColors.Clay,
+    color: Color = HealthColors.Muted,
     filled: Boolean = false,
     icon: ImageVector? = null,
     onClick: (() -> Unit)? = null,
 ) {
+    val bg = if (filled) color else HealthColors.tint(color)
+    val fg = if (filled) HealthColors.Card else if (color == HealthColors.Muted || color == HealthColors.Faint) HealthColors.InkSoft else color
     Row(
         modifier = modifier
             .clip(CircleShape)
-            .background(if (filled) color.copy(alpha = 0.18f) else HealthColors.SurfaceHigh.copy(alpha = 0.6f))
-            .border(1.dp, color.copy(alpha = if (filled) 0.5f else 0.25f), CircleShape)
+            .background(bg)
             .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 10.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
     ) {
-        if (icon != null) Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(12.dp))
-        Text(text, style = MaterialTheme.typography.labelSmall, color = color, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        if (icon != null) Icon(icon, contentDescription = null, tint = fg, modifier = Modifier.size(12.dp))
+        Text(text, style = MaterialTheme.typography.labelSmall, color = fg, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
-/** ▼ -2.5 lbs / ▲ +4 bpm style delta badge; colour conveys whether the direction is good. */
+/** ▼ -2.5 lbs / ▲ +4 bpm style delta badge; green when the direction is good, terracotta otherwise. */
 @Composable
 fun DeltaBadge(delta: Double, unit: String, lowerIsBetter: Boolean = true, decimals: Int = 1, suffix: String = "") {
     val improving = if (lowerIsBetter) delta <= 0 else delta >= 0
-    val color = if (improving) HealthColors.Emerald else HealthColors.Coral
+    val color = if (improving) HealthColors.Green else HealthColors.Terracotta
     val icon = if (delta < 0) Icons.Default.ArrowDropDown else Icons.Default.ArrowDropUp
     Row(
         modifier = Modifier
             .clip(CircleShape)
-            .background(color.copy(alpha = 0.14f))
+            .background(HealthColors.tint(color))
             .padding(start = 4.dp, end = 10.dp, top = 3.dp, bottom = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -169,75 +147,88 @@ fun DeltaBadge(delta: Double, unit: String, lowerIsBetter: Boolean = true, decim
     }
 }
 
-/** Full-width gradient call-to-action with a soft glow. */
+/** Full-width flat call-to-action. */
 @Composable
-fun GradientButton(
+fun PrimaryButton(
     text: String,
     modifier: Modifier = Modifier,
-    brush: Brush = HealthColors.amberGold,
-    glowColor: Color = HealthColors.Amber,
+    color: Color = HealthColors.Green,
     icon: ImageVector? = null,
-    textColor: Color = HealthColors.Obsidian,
+    textColor: Color = HealthColors.Card,
     height: Dp = 54.dp,
     onClick: () -> Unit,
 ) {
     val shape = RoundedCornerShape(18.dp)
     Box(
         modifier = modifier
-            .drawBehind {
-                drawRoundRect(
-                    brush = Brush.radialGradient(
-                        listOf(glowColor.copy(alpha = 0.35f), Color.Transparent),
-                        center = Offset(size.width / 2, size.height),
-                        radius = size.width * 0.6f,
-                    ),
-                    topLeft = Offset(0f, size.height * 0.2f),
-                    size = Size(size.width, size.height * 1.2f),
-                    cornerRadius = CornerRadius(40f),
-                )
-            }
             .height(height)
             .clip(shape)
-            .background(brush)
+            .background(color)
             .clickable(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            if (icon != null) Icon(icon, contentDescription = null, tint = textColor)
-            Text(text, style = MaterialTheme.typography.titleMedium, color = textColor, fontWeight = FontWeight.Bold)
+            if (icon != null) Icon(icon, contentDescription = null, tint = textColor, modifier = Modifier.size(20.dp))
+            Text(text, style = MaterialTheme.typography.titleMedium, color = textColor)
         }
     }
 }
 
-/** Compact bento stat tile: eyebrow label, hero value, supporting line. */
+/** Secondary flat button on a tonal fill. */
+@Composable
+fun TonalButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = HealthColors.Green,
+    icon: ImageVector? = null,
+    height: Dp = 46.dp,
+    onClick: () -> Unit,
+) {
+    val shape = RoundedCornerShape(16.dp)
+    Box(
+        modifier = modifier
+            .height(height)
+            .clip(shape)
+            .background(HealthColors.tint(color))
+            .clickable(onClick = onClick),
+        contentAlignment = Alignment.Center,
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+            if (icon != null) Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(18.dp))
+            Text(text, style = MaterialTheme.typography.labelLarge, color = color)
+        }
+    }
+}
+
+/** Compact bento stat tile: small label, hero number, supporting line. */
 @Composable
 fun StatTile(
     label: String,
     value: String,
     modifier: Modifier = Modifier,
-    accent: Color = HealthColors.Amber,
+    accent: Color = HealthColors.Green,
     unit: String? = null,
     support: String? = null,
     icon: ImageVector? = null,
-    glow: Boolean = false,
+    tinted: Boolean = false,
     compact: Boolean = false,
     onClick: (() -> Unit)? = null,
     trailing: (@Composable () -> Unit)? = null,
 ) {
-    GlowCard(modifier = modifier, accent = accent, glow = glow, contentPadding = PaddingValues(if (compact) 12.dp else 16.dp), onClick = onClick) {
+    SoftCard(modifier = modifier, accent = accent, tinted = tinted, contentPadding = PaddingValues(if (compact) 12.dp else 16.dp), onClick = onClick) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (icon != null) {
                 Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(16.dp))
                 Spacer(Modifier.width(6.dp))
             }
-            Text(label.uppercase(), style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
+            Eyebrow(label)
         }
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(6.dp))
         Row(verticalAlignment = Alignment.Bottom) {
-            Text(value, style = if (compact) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium, color = HealthColors.OnSurface, maxLines = 1, softWrap = false)
+            Text(value, style = if (compact) MaterialTheme.typography.headlineSmall else MaterialTheme.typography.headlineMedium, color = HealthColors.Ink, maxLines = 1, softWrap = false)
             if (unit != null) {
                 Spacer(Modifier.width(4.dp))
-                Text(unit, style = MaterialTheme.typography.labelMedium, color = HealthColors.Clay, maxLines = 1, softWrap = false, modifier = Modifier.padding(bottom = 3.dp))
+                Text(unit, style = MaterialTheme.typography.labelMedium, color = HealthColors.Muted, maxLines = 1, softWrap = false, modifier = Modifier.padding(bottom = 4.dp))
             }
             if (trailing != null) {
                 Spacer(Modifier.weight(1f))
@@ -246,28 +237,29 @@ fun StatTile(
         }
         if (support != null) {
             Spacer(Modifier.height(4.dp))
-            Text(support, style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+            Text(support, style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
         }
     }
 }
 
+/** Small sentence-case label above a value. */
 @Composable
-fun Eyebrow(text: String, color: Color = HealthColors.Clay, modifier: Modifier = Modifier) {
-    Text(text.uppercase(), style = MaterialTheme.typography.labelSmall, color = color, modifier = modifier)
+fun Eyebrow(text: String, color: Color = HealthColors.Muted, modifier: Modifier = Modifier) {
+    Text(text, style = MaterialTheme.typography.labelMedium, color = color, modifier = modifier)
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA)
 @Composable
-private fun GlowCardPreview() {
+private fun SoftCardPreview() {
     HealthTheme {
         Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            GlowCard(accent = HealthColors.Emerald) {
+            SoftCard {
                 Eyebrow("Recovery")
-                Text("84%", style = MaterialTheme.typography.displaySmall, color = HealthColors.OnSurface)
+                Text("84%", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink)
                 DeltaBadge(4.0, "pts", lowerIsBetter = false, decimals = 0)
             }
-            StatTile("Body weight", "168.9", unit = "lbs", support = "Fitbit Scale · 7:12 AM", accent = HealthColors.Amber)
-            GradientButton("Start Strength Workout") {}
+            StatTile("Body weight", "168.9", unit = "lbs", support = "Fitbit Scale · 7:12 AM")
+            PrimaryButton("Start strength workout") {}
         }
     }
 }

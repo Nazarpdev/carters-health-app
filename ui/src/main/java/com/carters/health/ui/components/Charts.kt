@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.HealthTheme
+import com.carters.health.ui.theme.SansFamily
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
@@ -74,7 +75,7 @@ data class ChartSeries(
 fun Sparkline(
     values: List<Float>,
     modifier: Modifier = Modifier,
-    color: Color = HealthColors.Coral,
+    color: Color = HealthColors.Terracotta,
     strokeWidth: Dp = 2.dp,
     fill: Boolean = true,
     reveal: Boolean = true,
@@ -100,7 +101,7 @@ fun Sparkline(
                 lineTo(0f, size.height)
                 close()
             }
-            drawPath(fillPath, Brush.verticalGradient(listOf(color.copy(alpha = 0.35f), Color.Transparent)))
+            drawPath(fillPath, color.copy(alpha = 0.14f))
         }
         drawPath(drawn, color, style = Stroke(strokeWidth.toPx(), cap = StrokeCap.Round))
         if (showEndDot && visible >= 0.999f) {
@@ -144,9 +145,9 @@ fun ScrubbableLineChart(
     var scrubX by remember { mutableStateOf<Float?>(null) }
     var lastIndex by remember { mutableStateOf(-1) }
     val reveal by rememberRevealedProgress(1f, "chartReveal")
-    val labelStyle = TextStyle(color = HealthColors.ClayDim, fontSize = 10.sp, fontWeight = FontWeight.Medium)
-    val readoutStyle = TextStyle(color = HealthColors.OnSurface, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-    val readoutSub = TextStyle(color = HealthColors.Clay, fontSize = 10.sp, fontWeight = FontWeight.Medium)
+    val labelStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Faint, fontSize = 10.sp, fontWeight = FontWeight.Medium)
+    val readoutStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Card, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+    val readoutSub = TextStyle(fontFamily = SansFamily, color = HealthColors.CardAlt, fontSize = 10.sp, fontWeight = FontWeight.Medium)
 
     val count = series.maxOfOrNull { it.values.size } ?: 0
     Canvas(
@@ -181,7 +182,7 @@ fun ScrubbableLineChart(
         // grid
         for (g in 0..gridLines) {
             val y = topPad + plotH * g / gridLines
-            drawLine(HealthColors.Border.copy(alpha = 0.6f), Offset(leftPad, y), Offset(size.width - rightPad, y), 1f)
+            drawLine(HealthColors.Hairline, Offset(leftPad, y), Offset(size.width - rightPad, y), 1f)
             val v = hi - span * g / gridLines
             drawText(measurer, formatValue(v), Offset(leftPad, y - 12.sp.toPx()), labelStyle)
         }
@@ -198,10 +199,10 @@ fun ScrubbableLineChart(
         if (baseline != null) {
             val y = yOf(baseline)
             drawLine(
-                HealthColors.Sand.copy(alpha = 0.5f), Offset(leftPad, y), Offset(size.width - rightPad, y), 1.5f,
+                HealthColors.Faint, Offset(leftPad, y), Offset(size.width - rightPad, y), 1.5f,
                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 8f)),
             )
-            val layout = measurer.measure(baselineLabel, labelStyle.copy(color = HealthColors.Sand))
+            val layout = measurer.measure(baselineLabel, labelStyle.copy(color = HealthColors.Muted))
             drawText(layout, topLeft = Offset(size.width - rightPad - layout.size.width, y - layout.size.height - 2.dp.toPx()))
         }
         // series
@@ -218,13 +219,11 @@ fun ScrubbableLineChart(
                     lineTo(leftPad, topPad + plotH)
                     close()
                 }
-                drawPath(fillPath, Brush.verticalGradient(listOf(s.color.copy(alpha = 0.28f), Color.Transparent), startY = topPad, endY = topPad + plotH))
+                drawPath(fillPath, s.color.copy(alpha = 0.12f))
             }
-            // glow pass
-            drawPath(path, s.color.copy(alpha = 0.25f), style = Stroke(strokeWidth.toPx() * 3f, cap = StrokeCap.Round))
             drawPath(
                 path,
-                brush = Brush.horizontalGradient(s.gradient),
+                color = s.color,
                 style = Stroke(
                     strokeWidth.toPx(), cap = StrokeCap.Round,
                     pathEffect = if (s.dashed) PathEffect.dashPathEffect(floatArrayOf(10f, 8f)) else null,
@@ -241,12 +240,11 @@ fun ScrubbableLineChart(
                 onScrub?.invoke(idx)
             }
             val x = xOf(idx, count)
-            drawLine(HealthColors.Sand.copy(alpha = 0.6f), Offset(x, topPad - 6.dp.toPx()), Offset(x, topPad + plotH), 1.5f)
+            drawLine(HealthColors.Faint, Offset(x, topPad - 6.dp.toPx()), Offset(x, topPad + plotH), 1.5f)
             val lines = series.mapNotNull { s -> s.values.getOrNull(idx)?.let { v -> Triple(s, v, yOf(v)) } }
             lines.forEach { (s, _, y) ->
-                drawCircle(s.color.copy(alpha = 0.35f), 12.dp.toPx() / 2, Offset(x, y))
+                drawCircle(HealthColors.Card, 6.dp.toPx(), Offset(x, y))
                 drawCircle(s.color, 4.dp.toPx(), Offset(x, y))
-                drawCircle(Color.White, 1.5.dp.toPx(), Offset(x, y))
             }
             val primary = lines.firstOrNull() ?: return@Canvas
             val valueText = buildString {
@@ -259,8 +257,7 @@ fun ScrubbableLineChart(
             val w = maxOf(vLayout.size.width, sLayout.size.width) + 24.dp.toPx()
             val h = vLayout.size.height + (if (sub.isEmpty()) 0 else sLayout.size.height) + 14.dp.toPx()
             val bx = (x - w / 2).coerceIn(0f, size.width - w)
-            drawRoundRect(HealthColors.SurfaceHigh, Offset(bx, 0f), Size(w, h), CornerRadius(12.dp.toPx()))
-            drawRoundRect(primary.first.color.copy(alpha = 0.6f), Offset(bx, 0f), Size(w, h), CornerRadius(12.dp.toPx()), style = Stroke(1.5f))
+            drawRoundRect(HealthColors.Ink, Offset(bx, 0f), Size(w, h), CornerRadius(12.dp.toPx()))
             drawText(vLayout, topLeft = Offset(bx + 12.dp.toPx(), 7.dp.toPx()))
             if (sub.isNotEmpty()) drawText(sLayout, topLeft = Offset(bx + 12.dp.toPx(), 7.dp.toPx() + vLayout.size.height))
         }
@@ -310,14 +307,14 @@ fun BarStrip(
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA)
 @Composable
 private fun ChartPreview() {
     HealthTheme {
         val values = (0 until 30).map { 170f - it * 0.1f + (2 * sin(it / 3f)) }
         Column(Modifier.padding(16.dp)) {
             ScrubbableLineChart(
-                series = listOf(ChartSeries(values, HealthColors.Amber, listOf(HealthColors.Amber, HealthColors.Gold))),
+                series = listOf(ChartSeries(values, HealthColors.Green)),
                 modifier = Modifier.fillMaxWidth().height(220.dp),
                 baseline = 169.2f,
                 xLabel = { "D$it" },

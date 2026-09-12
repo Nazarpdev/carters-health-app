@@ -1,7 +1,6 @@
 package com.carters.health.ui.screens.workout
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,13 +40,15 @@ import com.carters.health.data.model.Exercise
 import com.carters.health.data.model.MuscleGroup
 import com.carters.health.data.repo.HealthRepository
 import com.carters.health.ui.components.Eyebrow
-import com.carters.health.ui.components.GlowCard
-import com.carters.health.ui.components.GradientButton
+import com.carters.health.ui.components.SoftCard
+import com.carters.health.ui.components.PrimaryButton
+import com.carters.health.ui.components.TonalButton
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.components.SectionHeader
 import com.carters.health.ui.components.SegmentedControl
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.LocalHealthHaptics
+import com.carters.health.ui.theme.SansFamily
 
 @Composable
 fun LibraryTab(repository: HealthRepository, onAddToWorkout: (Exercise) -> Unit, modifier: Modifier = Modifier) {
@@ -69,14 +70,14 @@ fun LibraryTab(repository: HealthRepository, onAddToWorkout: (Exercise) -> Unit,
         item { SearchField(query, { query = it }, "Search ${exercises.size} exercises") }
         item { MuscleFilterRow(group) { group = it } }
         item {
-            GradientButton("Create Custom Exercise", icon = Icons.Default.Add, brush = HealthColors.lavenderViolet, glowColor = HealthColors.Violet, modifier = Modifier.fillMaxWidth(), height = 48.dp) { showCreate = true }
+            TonalButton("Create custom exercise", icon = Icons.Default.Add, modifier = Modifier.fillMaxWidth(), height = 48.dp) { showCreate = true }
         }
         grouped.forEach { (g, list) ->
             item(key = "header-${g.name}") {
                 SectionHeader(g.label, subtitle = "${list.size} exercises", modifier = Modifier.padding(top = 8.dp))
             }
             items(list, key = { it.id }) { ex ->
-                ExerciseListRow(ex, trailing = { Icon(Icons.Default.ChevronRight, contentDescription = null, tint = HealthColors.Clay) }) { haptics.confirm(); onAddToWorkout(ex) }
+                ExerciseListRow(ex, trailing = { Icon(Icons.Default.ChevronRight, contentDescription = null, tint = HealthColors.Muted) }) { haptics.confirm(); onAddToWorkout(ex) }
             }
         }
     }
@@ -99,41 +100,41 @@ private fun CreateExerciseDialog(onDismiss: () -> Unit, onCreate: (Exercise) -> 
     var restIndex by remember { mutableStateOf(2) }
 
     Dialog(onDismissRequest = onDismiss) {
-        GlowCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(20.dp)) {
-            Text("Custom exercise", style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
+        SoftCard(accent = HealthColors.Sage, contentPadding = PaddingValues(20.dp)) {
+            Text("Custom exercise", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             Spacer(Modifier.height(14.dp))
             Eyebrow("Name")
             Spacer(Modifier.height(6.dp))
             val shape = RoundedCornerShape(12.dp)
             BasicTextField(
                 value = name, onValueChange = { name = it }, singleLine = true,
-                textStyle = TextStyle(color = HealthColors.OnSurface, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
-                cursorBrush = SolidColor(HealthColors.Lavender),
-                modifier = Modifier.fillMaxWidth().clip(shape).background(HealthColors.Surface).border(1.dp, HealthColors.Border, shape).padding(12.dp),
-                decorationBox = { inner -> if (name.isEmpty()) Text("e.g. Landmine Press", color = HealthColors.ClayDim); inner() },
+                textStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Ink, fontSize = MaterialTheme.typography.bodyLarge.fontSize),
+                cursorBrush = SolidColor(HealthColors.Sage),
+                modifier = Modifier.fillMaxWidth().clip(shape).background(HealthColors.Field).padding(12.dp),
+                decorationBox = { inner -> if (name.isEmpty()) Text("e.g. Landmine Press", color = HealthColors.Faint); inner() },
             )
             Spacer(Modifier.height(14.dp))
             Eyebrow("Muscle group")
             Spacer(Modifier.height(6.dp))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                items(MuscleGroup.entries) { g -> Pill(g.label, color = if (g == group) HealthColors.Lavender else HealthColors.Clay, filled = g == group) { group = g } }
+                items(MuscleGroup.entries) { g -> Pill(g.label, color = if (g == group) HealthColors.Sage else HealthColors.Muted, filled = g == group) { group = g } }
             }
             Spacer(Modifier.height(14.dp))
             Eyebrow("Equipment")
             Spacer(Modifier.height(6.dp))
             LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                items(Equipment.entries) { e -> Pill(e.label, color = if (e == equipment) HealthColors.Lavender else HealthColors.Clay, filled = e == equipment) { equipment = e } }
+                items(Equipment.entries) { e -> Pill(e.label, color = if (e == equipment) HealthColors.Sage else HealthColors.Muted, filled = e == equipment) { equipment = e } }
             }
             Spacer(Modifier.height(14.dp))
             Eyebrow("Default rest")
             Spacer(Modifier.height(6.dp))
-            SegmentedControl(restOptions.map { "${it}s" }, restIndex, { restIndex = it }, Modifier.fillMaxWidth(), accent = HealthColors.Lavender, height = 34.dp)
+            SegmentedControl(restOptions.map { "${it}s" }, restIndex, { restIndex = it }, Modifier.fillMaxWidth(), accent = HealthColors.Sage, height = 34.dp)
             Spacer(Modifier.height(18.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Cancel", style = MaterialTheme.typography.labelLarge, color = HealthColors.Clay, modifier = Modifier.clickable(onClick = onDismiss).padding(8.dp))
+                Text("Cancel", style = MaterialTheme.typography.labelLarge, color = HealthColors.Muted, modifier = Modifier.clickable(onClick = onDismiss).padding(8.dp))
                 Spacer(Modifier.width(8.dp))
-                GradientButton(
-                    "Save exercise", brush = HealthColors.lavenderViolet, glowColor = HealthColors.Violet, textColor = HealthColors.OnSurface,
+                PrimaryButton(
+                    "Save exercise",
                     modifier = Modifier.weight(1f), height = 46.dp,
                 ) {
                     if (name.isNotBlank()) onCreate(Exercise(0, name.trim(), group, equipment, restOptions[restIndex], isCustom = true))

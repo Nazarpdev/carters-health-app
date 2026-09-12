@@ -8,7 +8,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
@@ -61,7 +59,7 @@ import com.carters.health.data.repo.HealthRepository
 import com.carters.health.data.repo.InMemoryHealthRepository
 import com.carters.health.ui.components.DistributionBar
 import com.carters.health.ui.components.Eyebrow
-import com.carters.health.ui.components.GlowCard
+import com.carters.health.ui.components.SoftCard
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.components.RadialGauge
 import com.carters.health.ui.components.SectionHeader
@@ -69,6 +67,7 @@ import com.carters.health.ui.components.rememberRevealedProgress
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.HealthTheme
 import com.carters.health.ui.theme.LocalHealthHaptics
+import com.carters.health.ui.theme.SansFamily
 import com.carters.health.ui.theme.stageColor
 import java.time.Duration
 import java.time.format.DateTimeFormatter
@@ -84,14 +83,14 @@ fun SleepScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
     val dateFmt = remember { DateTimeFormatter.ofPattern("EEEE, MMM d") }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().background(HealthColors.Obsidian),
+        modifier = modifier.fillMaxSize().background(HealthColors.Canvas),
         contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 120.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
             Column {
-                Text("Sleep", style = MaterialTheme.typography.headlineMedium, color = HealthColors.OnSurface)
-                Text("Rest & recharge tonight — deep sleep builds tomorrow's readiness.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+                Text("Sleep", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
+                Text("Rest & recharge tonight — deep sleep builds tomorrow's readiness.", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
             }
         }
         item {
@@ -131,8 +130,8 @@ private fun DateNavigator(label: String, sub: String, canPrev: Boolean, canNext:
     Row(verticalAlignment = Alignment.CenterVertically) {
         NavChevron(Icons.Default.ChevronLeft, canPrev, onPrev)
         Column(Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(label, style = MaterialTheme.typography.titleMedium, color = HealthColors.OnSurface)
-            Text(sub, style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
+            Text(label, style = MaterialTheme.typography.titleMedium, color = HealthColors.Ink)
+            Text(sub, style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
         }
         NavChevron(Icons.Default.ChevronRight, canNext, onNext)
     }
@@ -144,46 +143,45 @@ private fun NavChevron(icon: androidx.compose.ui.graphics.vector.ImageVector, en
         Modifier
             .size(40.dp)
             .clip(CircleShape)
-            .background(HealthColors.Espresso)
-            .border(1.dp, if (enabled) HealthColors.Lavender.copy(alpha = 0.5f) else HealthColors.Border, CircleShape)
+            .background(if (enabled) HealthColors.GreenSoft else HealthColors.CardAlt)
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, contentDescription = null, tint = if (enabled) HealthColors.Lavender else HealthColors.ClayDim)
+        Icon(icon, contentDescription = null, tint = if (enabled) HealthColors.GreenDeep else HealthColors.Faint)
     }
 }
 
 @Composable
 private fun SleepScoreCard(night: SleepNight) {
     val timeFmt = DateTimeFormatter.ofPattern("h:mm a")
-    GlowCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(20.dp)) {
+    SoftCard(accent = HealthColors.Sage, contentPadding = PaddingValues(20.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            RadialGauge(progress = night.score / 100f, modifier = Modifier.size(150.dp), colors = listOf(HealthColors.Violet, HealthColors.Lavender), strokeWidth = 12.dp) {
+            RadialGauge(progress = night.score / 100f, modifier = Modifier.size(150.dp), colors = listOf(HealthColors.GreenDeep, HealthColors.Sage), strokeWidth = 12.dp) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${night.score}", style = MaterialTheme.typography.displaySmall, color = HealthColors.OnSurface, fontWeight = FontWeight.Bold)
-                    Eyebrow("Sleep score", HealthColors.Lavender)
+                    Text("${night.score}", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink, fontWeight = FontWeight.Bold)
+                    Eyebrow("Sleep score", HealthColors.Sage)
                 }
             }
             Spacer(Modifier.width(18.dp))
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Column {
                     Eyebrow("Total rest")
-                    Text(hm(night.totalMinutes), style = MaterialTheme.typography.headlineSmall, color = HealthColors.OnSurface)
+                    Text(hm(night.totalMinutes), style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
                 }
                 Column {
                     Eyebrow("Sleep debt")
                     Text(
                         if (night.sleepDebtMinutes == 0) "Cleared" else "-${hm(night.sleepDebtMinutes.toLong())}",
                         style = MaterialTheme.typography.titleLarge,
-                        color = if (night.sleepDebtMinutes == 0) HealthColors.Emerald else HealthColors.Coral,
+                        color = if (night.sleepDebtMinutes == 0) HealthColors.Green else HealthColors.Terracotta,
                     )
                 }
             }
         }
         Spacer(Modifier.height(14.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Pill("Bed ${night.start.format(timeFmt)}", color = HealthColors.Lavender, icon = Icons.Default.Bedtime)
-            Pill("Wake ${night.end.format(timeFmt)}", color = HealthColors.Gold, icon = Icons.Default.WbSunny)
+            Pill("Bed ${night.start.format(timeFmt)}", color = HealthColors.Sage, icon = Icons.Default.Bedtime)
+            Pill("Wake ${night.end.format(timeFmt)}", color = HealthColors.Green, icon = Icons.Default.WbSunny)
         }
     }
 }
@@ -193,11 +191,11 @@ private fun SleepScoreCard(night: SleepNight) {
 private fun HypnogramCard(night: SleepNight) {
     val measurer = rememberTextMeasurer()
     val reveal by rememberRevealedProgress(1f, "hypno")
-    val labelStyle = TextStyle(color = HealthColors.ClayDim, fontSize = 10.sp, fontWeight = FontWeight.Medium)
+    val labelStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Muted, fontSize = 10.sp, fontWeight = FontWeight.Medium)
     val timeFmt = DateTimeFormatter.ofPattern("h a")
-    GlowCard(accent = HealthColors.Violet, glow = false, contentPadding = PaddingValues(16.dp)) {
-        Eyebrow("Hypnogram", HealthColors.Lavender)
-        Text("${night.segments.size} stage transitions · ${hm(night.timeInBedMinutes)} in bed", style = MaterialTheme.typography.bodySmall, color = HealthColors.Clay)
+    SoftCard(accent = HealthColors.GreenDeep, contentPadding = PaddingValues(16.dp)) {
+        Eyebrow("Hypnogram", HealthColors.Sage)
+        Text("${night.segments.size} stage transitions · ${hm(night.timeInBedMinutes)} in bed", style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
         Spacer(Modifier.height(10.dp))
         Canvas(Modifier.fillMaxWidth().height(170.dp)) {
             val leftPad = 44.dp.toPx()
@@ -208,8 +206,8 @@ private fun HypnogramCard(night: SleepNight) {
             val laneH = plotH / lanes.size
             lanes.forEachIndexed { i, s ->
                 val y = i * laneH
-                drawLine(HealthColors.Border.copy(alpha = 0.5f), Offset(leftPad, y + laneH), Offset(size.width, y + laneH), 1f)
-                drawText(measurer, s.label, Offset(0f, y + laneH / 2 - 7.sp.toPx()), labelStyle.copy(color = stageColor(s)))
+                drawLine(HealthColors.Hairline, Offset(leftPad, y + laneH), Offset(size.width, y + laneH), 1f)
+                drawText(measurer, s.label, Offset(0f, y + laneH / 2 - 7.sp.toPx()), labelStyle)
             }
             val total = night.timeInBedMinutes.toFloat().coerceAtLeast(1f)
             var prevEnd: Offset? = null
@@ -222,10 +220,9 @@ private fun HypnogramCard(night: SleepNight) {
                 val h = laneH * 0.6f
                 val c = stageColor(seg.stage)
                 val r = 4.dp.toPx()
-                drawRoundRect(c.copy(alpha = 0.22f), Offset(x0, y - 3.dp.toPx()), Size(w, h + 6.dp.toPx()), CornerRadius(r + 2))
-                drawRoundRect(Brush.verticalGradient(listOf(c, c.copy(alpha = 0.7f))), Offset(x0, y), Size(w, h), CornerRadius(r))
+                drawRoundRect(c, Offset(x0, y), Size(w, h), CornerRadius(r))
                 val mid = Offset(x0, y + h / 2)
-                if (prevEnd != null) drawLine(HealthColors.Sand.copy(alpha = 0.25f), prevEnd!!, mid, 1.5f)
+                if (prevEnd != null) drawLine(HealthColors.Hairline, prevEnd!!, mid, 1.5f)
                 prevEnd = Offset(x0 + w, y + h / 2)
             }
             // time axis
@@ -249,7 +246,7 @@ private fun HypnogramCard(night: SleepNight) {
 private fun StageBreakdown(night: SleepNight) {
     val asleep = night.timeInBedMinutes.toFloat().coerceAtLeast(1f)
     val order = listOf(SleepStage.DEEP, SleepStage.REM, SleepStage.LIGHT, SleepStage.AWAKE)
-    GlowCard(accent = HealthColors.StageDeep, glow = false, contentPadding = PaddingValues(16.dp)) {
+    SoftCard(accent = HealthColors.StageDeep, contentPadding = PaddingValues(16.dp)) {
         Eyebrow("Stage distribution")
         Spacer(Modifier.height(10.dp))
         DistributionBar(order.map { night.minutesIn(it).toFloat() to stageColor(it) })
@@ -261,10 +258,10 @@ private fun StageBreakdown(night: SleepNight) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(Modifier.size(8.dp).clip(CircleShape).background(stageColor(s)))
                         Spacer(Modifier.width(5.dp))
-                        Text(s.label, style = MaterialTheme.typography.labelSmall, color = HealthColors.Clay)
+                        Text(s.label, style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
                     }
-                    Text(hm(m), style = MaterialTheme.typography.titleSmall, color = HealthColors.OnSurface)
-                    Text("${(m / asleep * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = stageColor(s))
+                    Text(hm(m), style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
+                    Text("${(m / asleep * 100).toInt()}%", style = MaterialTheme.typography.labelSmall, color = HealthColors.Muted)
                 }
             }
         }
@@ -275,27 +272,26 @@ private fun StageBreakdown(night: SleepNight) {
 private fun NightRow(night: SleepNight, selected: Boolean, onClick: () -> Unit) {
     val shape = RoundedCornerShape(14.dp)
     val accent = when {
-        night.score >= 80 -> HealthColors.Emerald
-        night.score >= 60 -> HealthColors.Lavender
-        else -> HealthColors.Coral
+        night.score >= 80 -> HealthColors.Green
+        night.score >= 60 -> HealthColors.Sage
+        else -> HealthColors.Terracotta
     }
     Row(
         Modifier
             .fillMaxWidth()
             .clip(shape)
-            .background(if (selected) HealthColors.Surface else HealthColors.Espresso)
-            .border(1.dp, if (selected) HealthColors.Lavender.copy(alpha = 0.6f) else HealthColors.Border, shape)
+            .background(if (selected) HealthColors.GreenSoft else HealthColors.Card)
             .clickable(onClick = onClick)
             .padding(horizontal = 14.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            Modifier.size(42.dp).clip(CircleShape).background(accent.copy(alpha = 0.15f)).border(1.dp, accent.copy(alpha = 0.6f), CircleShape),
+            Modifier.size(42.dp).clip(CircleShape).background(HealthColors.tint(accent)),
             contentAlignment = Alignment.Center,
         ) { Text("${night.score}", style = MaterialTheme.typography.titleSmall, color = accent) }
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text(night.date.format(DateTimeFormatter.ofPattern("EEE, MMM d")), style = MaterialTheme.typography.titleSmall, color = HealthColors.OnSurface)
+            Text(night.date.format(DateTimeFormatter.ofPattern("EEE, MMM d")), style = MaterialTheme.typography.titleSmall, color = HealthColors.Ink)
             Spacer(Modifier.height(6.dp))
             DistributionBar(
                 listOf(SleepStage.DEEP, SleepStage.REM, SleepStage.LIGHT, SleepStage.AWAKE).map { night.minutesIn(it).toFloat() to stageColor(it) },
@@ -304,13 +300,13 @@ private fun NightRow(night: SleepNight, selected: Boolean, onClick: () -> Unit) 
         }
         Spacer(Modifier.width(12.dp))
         Column(horizontalAlignment = Alignment.End) {
-            Text(hm(night.totalMinutes), style = MaterialTheme.typography.titleSmall, color = HealthColors.Sand)
-            Pill("${night.sourceRecordCount} rec", color = HealthColors.ClayDim)
+            Text(hm(night.totalMinutes), style = MaterialTheme.typography.titleSmall, color = HealthColors.InkSoft)
+            Pill("${night.sourceRecordCount} rec", color = HealthColors.Faint)
         }
     }
 }
 
-@Preview(showBackground = true, backgroundColor = 0xFF000000, heightDp = 1400)
+@Preview(showBackground = true, backgroundColor = 0xFFF4F1EA, heightDp = 1400)
 @Composable
 private fun SleepPreview() {
     HealthTheme { SleepScreen(InMemoryHealthRepository()) }
