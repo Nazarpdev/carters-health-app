@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.MonitorHeart
 import androidx.compose.material.icons.filled.Psychology
 import androidx.compose.material.icons.filled.Scale
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +50,11 @@ import androidx.compose.ui.unit.dp
 import com.carters.health.data.model.format0
 import com.carters.health.data.repo.HealthRepository
 import com.carters.health.data.repo.InMemoryHealthRepository
+import com.carters.health.ui.components.AnimatedNumber
 import com.carters.health.ui.components.BeatingHeart
+import com.carters.health.ui.components.Staggered
+import com.carters.health.ui.components.pressableClick
+import com.carters.health.ui.settings.LocalAppSettings
 import com.carters.health.ui.components.DeltaBadge
 import com.carters.health.ui.components.DialRing
 import com.carters.health.ui.components.Eyebrow
@@ -89,6 +94,7 @@ internal fun greetingFor(hour: Int, readiness: Int, strain: Double): Greeting {
 fun DashboardScreen(
     repository: HealthRepository,
     onOpenWeight: () -> Unit,
+    onOpenSettings: () -> Unit,
     onStartWorkout: () -> Unit,
     modifier: Modifier = Modifier,
     hourOfDay: Int = LocalTime.now().hour,
@@ -102,6 +108,7 @@ fun DashboardScreen(
     val rhr by repository.restingHr.collectAsState()
     val hrv by repository.hrv.collectAsState()
     val greeting = remember(hourOfDay, readiness) { greetingFor(hourOfDay, readiness.readinessPercent, readiness.strain) }
+    val settings = LocalAppSettings.current
 
     LazyColumn(
         modifier = modifier.fillMaxSize().background(HealthColors.Canvas),
@@ -110,26 +117,29 @@ fun DashboardScreen(
     ) {
         val edge = Modifier.padding(horizontal = 20.dp)
         item {
-            GreetingHeader(greeting, watch.connected, watch.batteryPercent, edge)
+            GreetingHeader(greeting, watch.connected, watch.batteryPercent, onOpenSettings, edge)
         }
         item {
-            PillarDialCard(readiness, edge)
+            Staggered(0) { PillarDialCard(readiness, edge) }
         }
         item {
-            LiveBiometricsStrip(
-                bpm = liveHr.lastOrNull()?.bpm ?: 0,
-                sparkline = liveHr.map { it.bpm.toFloat() },
-                modifier = edge,
-            )
+            Staggered(1) {
+                LiveBiometricsStrip(
+                    bpm = liveHr.lastOrNull()?.bpm ?: 0,
+                    sparkline = liveHr.map { it.bpm.toFloat() },
+                    modifier = edge,
+                )
+            }
         }
         item {
-            SectionHeader("Body & activity", modifier = edge)
+            Staggered(2) { SectionHeader("Body & activity", modifier = edge) }
         }
         item {
             val baseline30 = remember(weights) {
                 val cutoff = weights.lastOrNull()?.time?.minusDays(30)
                 weights.filter { cutoff != null && it.time >= cutoff }.map { it.weightLbs }.average().takeIf { !it.isNaN() }
             }
+            Staggered(3) {
             LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp), contentPadding = PaddingValues(horizontal = 20.dp)) {
                 item {
                     WeightCard(
@@ -141,7 +151,7 @@ fun DashboardScreen(
                     )
                 }
                 item {
-                    StepsCard(activity.steps, activity.stepGoal, activity.distanceKm, activity.activeCalories)
+                    StepsCard(activity.steps, settings.stepGoal, activity.distanceKm, activity.activeCalories)
                 }
                 item {
                     BaselineCard("Resting HR", rhr.current, "bpm", rhr.sevenDayAverage, lowerIsBetter = true, accent = HealthColors.Terracotta)
@@ -150,14 +160,18 @@ fun DashboardScreen(
                     BaselineCard("HRV", hrv.current, "ms", hrv.sevenDayAverage, lowerIsBetter = false, accent = HealthColors.Sky)
                 }
             }
+            }
         }
         item {
+            Staggered(4) {
             Row(edge, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 BurnTile(activity.activeCalories, activity.totalCalories, Modifier.weight(1f))
                 WindDownTile(hourOfDay, readiness.sleepDurationMinutes, Modifier.weight(1f))
             }
+            }
         }
         item {
+            Staggered(5) {
             PrimaryButton(
                 text = "Start Strength Workout",
                 icon = Icons.Default.FitnessCenter,
@@ -165,6 +179,7 @@ fun DashboardScreen(
                 modifier = edge.fillMaxWidth(),
                 onClick = onStartWorkout,
             )
+            }
         }
     }
 }
@@ -218,7 +233,7 @@ private fun WindDownTile(hour: Int, lastSleepMinutes: Int, modifier: Modifier = 
 }
 
 @Composable
-private fun GreetingHeader(greeting: Greeting, connected: Boolean, battery: Int, modifier: Modifier = Modifier) {
+private fun GreetingHeader(greeting: Greeting, connected: Boolean, battery: Int, onOpenSettings: () -> Unit, modifier: Modifier = Modifier) {
     Column(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Row(
@@ -247,6 +262,13 @@ private fun GreetingHeader(greeting: Greeting, connected: Boolean, battery: Int,
                 Icon(Icons.Default.BatteryChargingFull, contentDescription = null, tint = if (battery > 20) HealthColors.Green else HealthColors.Terracotta, modifier = Modifier.size(14.dp))
                 Text("$battery%", style = MaterialTheme.typography.labelMedium, color = HealthColors.InkSoft)
             }
+            Spacer(Modifier.width(8.dp))
+            Box(
+                Modifier.size(36.dp).clip(CircleShape).background(HealthColors.Card).pressableClick(pressed = 0.9f, onClick = onOpenSettings),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(Icons.Default.Settings, contentDescription = "Settings", tint = HealthColors.InkSoft, modifier = Modifier.size(18.dp))
+            }
         }
         Spacer(Modifier.height(12.dp))
         Text(greeting.body, style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink)
@@ -270,7 +292,7 @@ private fun PillarDialCard(readiness: com.carters.health.data.model.ReadinessSna
                 gap = 6.dp,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${readiness.readinessPercent}", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink)
+                    AnimatedNumber(readiness.readinessPercent, style = MaterialTheme.typography.displaySmall)
                     Eyebrow("Ready", HealthColors.Green)
                 }
             }
@@ -432,6 +454,6 @@ private fun BaselineCard(label: String, current: Int, unit: String, baseline: Do
 @Composable
 private fun DashboardPreview() {
     HealthTheme {
-        DashboardScreen(repository = InMemoryHealthRepository(), onOpenWeight = {}, onStartWorkout = {}, hourOfDay = 8)
+        DashboardScreen(repository = InMemoryHealthRepository(), onOpenWeight = {}, onOpenSettings = {}, onStartWorkout = {}, hourOfDay = 8)
     }
 }

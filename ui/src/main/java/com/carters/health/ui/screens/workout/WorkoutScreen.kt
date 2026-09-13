@@ -1,10 +1,6 @@
 package com.carters.health.ui.screens.workout
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -31,7 +27,9 @@ import com.carters.health.data.model.WorkoutSummary
 import com.carters.health.data.repo.HealthRepository
 import com.carters.health.data.repo.InMemoryHealthRepository
 import com.carters.health.data.repo.SampleData
+import com.carters.health.ui.components.Motion
 import com.carters.health.ui.components.SegmentedControl
+import com.carters.health.ui.settings.LocalAppSettings
 import com.carters.health.ui.components.UnitToggle
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.HealthTheme
@@ -54,11 +52,12 @@ fun WorkoutScreen(
     var mode by rememberSaveable { mutableStateOf(initialMode) }
     val library by repository.exercises.collectAsState()
     val haptics = LocalHealthHaptics.current
+    val settings = LocalAppSettings.current
 
     Column(modifier.fillMaxSize().background(HealthColors.Canvas)) {
         Row(Modifier.padding(start = 20.dp, end = 20.dp, top = 16.dp), verticalAlignment = Alignment.CenterVertically) {
             Text("Strength Studio", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink, modifier = Modifier.weight(1f))
-            UnitToggle(session.unit, { session.unit = it })
+            UnitToggle(settings.unit, { settings.updateUnit(it) })
         }
         Spacer(Modifier.height(12.dp))
         SegmentedControl(
@@ -73,8 +72,7 @@ fun WorkoutScreen(
             targetState = mode,
             transitionSpec = {
                 val forward = targetState.ordinal > initialState.ordinal
-                (slideInHorizontally { if (forward) it / 6 else -it / 6 } + fadeIn()) togetherWith
-                    (slideOutHorizontally { if (forward) -it / 6 else it / 6 } + fadeOut())
+                Motion.slideIn(forward, fraction = 6) togetherWith Motion.slideOut(forward, fraction = 6)
             },
             label = "workoutMode",
         ) { m ->

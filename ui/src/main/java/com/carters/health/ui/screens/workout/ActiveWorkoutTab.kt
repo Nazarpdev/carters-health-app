@@ -3,10 +3,8 @@ package com.carters.health.ui.screens.workout
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -78,7 +76,9 @@ import com.carters.health.data.model.format0
 import com.carters.health.ui.components.CountdownRing
 import com.carters.health.ui.components.Eyebrow
 import com.carters.health.ui.components.SoftCard
+import com.carters.health.ui.components.Motion
 import com.carters.health.ui.components.PrimaryButton
+import com.carters.health.ui.components.pressableClick
 import com.carters.health.ui.components.NumberField
 import com.carters.health.ui.components.Pill
 import com.carters.health.ui.theme.HealthColors
@@ -128,13 +128,13 @@ fun ActiveWorkoutTab(
         stickyHeader {
             Column(Modifier.background(HealthColors.Canvas).padding(bottom = 4.dp)) {
                 RestTimerCard(timer, exerciseName = session.lastCompletedExerciseName)
-                AnimatedVisibility(visible = celebrate, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+                AnimatedVisibility(visible = celebrate, enter = Motion.grow(), exit = Motion.shrink()) {
                     CelebrationBanner("Rest complete", "Load the bar.")
                 }
             }
         }
         items(session.exercises, key = { it.id }) { ex ->
-            ExerciseCard(session, ex)
+            GrowIn { ExerciseCard(session, ex) }
         }
         item {
             AddButton("Add Exercise", accent = HealthColors.Green) { showAddExercise = true }
@@ -208,7 +208,7 @@ private fun ChronometerHeader(session: WorkoutSessionState, onFinish: () -> Unit
 fun RestTimerCard(timer: RestTimerState, exerciseName: String?, modifier: Modifier = Modifier) {
     val haptics = LocalHealthHaptics.current
     val accent = if (timer.active) HealthColors.Green else HealthColors.Muted
-    SoftCard(modifier = modifier, accent = accent, tinted = timer.active, contentPadding = PaddingValues(14.dp), container = HealthColors.CardAlt) {
+    SoftCard(modifier = modifier.animateContentSize(Motion.sizeSpec()), accent = accent, tinted = timer.active, contentPadding = PaddingValues(14.dp), container = HealthColors.CardAlt) {
         if (timer.active) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 CountdownRing(fraction = timer.fraction, running = timer.running, modifier = Modifier.size(92.dp), strokeWidth = 8.dp) {
@@ -260,7 +260,7 @@ private fun TimerChip(
         modifier
             .clip(CircleShape)
             .background(HealthColors.Card)
-            .clickable(onClick = onClick)
+            .pressableClick(pressed = 0.94f, onClick = onClick)
             .padding(horizontal = 10.dp, vertical = 7.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -328,6 +328,7 @@ private fun ExerciseCard(session: WorkoutSessionState, ex: ExerciseState) {
         Spacer(Modifier.height(4.dp))
         ex.sets.forEach { set ->
             key(set.id) {
+                GrowIn {
                 SetRow(
                     label = ex.indexLabel(set),
                     set = set,
@@ -336,6 +337,7 @@ private fun ExerciseCard(session: WorkoutSessionState, ex: ExerciseState) {
                     onToggleDone = { haptics.confirm(); session.toggleSet(ex, set) },
                     onRemove = { session.removeSet(ex, set) },
                 )
+                }
             }
         }
         Spacer(Modifier.height(6.dp))
@@ -377,7 +379,7 @@ private fun SetRow(
     onRemove: () -> Unit,
 ) {
     val rowColor by animateColorAsState(
-        if (set.completed) HealthColors.Green.copy(alpha = 0.10f) else Color.Transparent, label = "row",
+        if (set.completed) HealthColors.GreenSoft else Color.Transparent, Motion.quick(), label = "row",
     )
     var weightText by remember(set.id, unit) { mutableStateOf(formatWeight(set.weightLbs, unit)) }
     var repsText by remember(set.id) { mutableStateOf(set.reps?.toString() ?: "") }
@@ -440,7 +442,7 @@ private fun SetRow(
             DoneButton(set.completed, onToggleDone)
         }
     }
-    AnimatedVisibility(visible = set.completed, enter = fadeIn() + expandVertically(), exit = fadeOut() + shrinkVertically()) {
+    AnimatedVisibility(visible = set.completed, enter = Motion.grow(), exit = Motion.shrink()) {
         val e1rm = set.estimatedOneRepMax
         Row(Modifier.padding(start = 8.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -458,8 +460,8 @@ private fun SetRow(
 
 @Composable
 private fun DoneButton(done: Boolean, onClick: () -> Unit) {
-    val scale by animateFloatAsState(if (done) 1.08f else 1f, com.carters.health.ui.components.Motion.softSpring, label = "doneScale")
-    val bg by animateColorAsState(if (done) HealthColors.Green else HealthColors.Field, label = "doneBg")
+    val scale by animateFloatAsState(if (done) 1.08f else 1f, Motion.soft(), label = "doneScale")
+    val bg by animateColorAsState(if (done) HealthColors.Green else HealthColors.Field, Motion.quick(), label = "doneBg")
     val border by animateColorAsState(if (done) HealthColors.Green else HealthColors.Hairline, label = "doneBorder")
     Box(
         Modifier
@@ -467,7 +469,7 @@ private fun DoneButton(done: Boolean, onClick: () -> Unit) {
             .scale(scale)
             .clip(RoundedCornerShape(11.dp))
             .background(bg)
-            .clickable(onClick = onClick),
+            .pressableClick(pressed = 0.9f, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(Icons.Default.Check, contentDescription = "Complete set", tint = if (done) HealthColors.Canvas else HealthColors.Muted, modifier = Modifier.size(20.dp))
@@ -482,7 +484,7 @@ fun AddButton(text: String, accent: Color, compact: Boolean = false, onClick: ()
             .fillMaxWidth()
             .clip(shape)
             .background(if (compact) HealthColors.Field else HealthColors.tint(accent))
-            .clickable(onClick = onClick)
+            .pressableClick(onClick = onClick)
             .padding(vertical = if (compact) 9.dp else 14.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
@@ -592,7 +594,8 @@ private fun FinishWorkoutDialog(session: WorkoutSessionState, onDismiss: () -> U
     val summary = remember { session.summary() }
     val unit = session.unit
     Dialog(onDismissRequest = onDismiss) {
-        SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(22.dp)) {
+        SettleIn {
+        SoftCard(accent = HealthColors.Ochre, contentPadding = PaddingValues(22.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.EmojiEvents, contentDescription = null, tint = HealthColors.Green, modifier = Modifier.size(28.dp))
                 Spacer(Modifier.width(10.dp))
@@ -630,6 +633,7 @@ private fun FinishWorkoutDialog(session: WorkoutSessionState, onDismiss: () -> U
                 modifier = Modifier.align(Alignment.CenterHorizontally).clip(CircleShape).clickable(onClick = onDismiss).padding(8.dp),
             )
         }
+        }
     }
 }
 
@@ -647,4 +651,18 @@ private fun SummaryTile(label: String, value: String, unit: String, accent: Colo
             if (unit.isNotEmpty()) { Spacer(Modifier.width(4.dp)); Text(unit, style = MaterialTheme.typography.labelMedium, color = HealthColors.Muted, modifier = Modifier.padding(bottom = 3.dp)) }
         }
     }
+}
+
+/** Wraps content that was just added so it grows into place on first composition. */
+@Composable
+fun GrowIn(content: @Composable () -> Unit) {
+    val state = remember { MutableTransitionState(!Motion.enabled).apply { targetState = true } }
+    AnimatedVisibility(visibleState = state, enter = Motion.grow(), exit = Motion.shrink()) { Column { content() } }
+}
+
+/** Dialog body that settles into view instead of popping. */
+@Composable
+fun SettleIn(content: @Composable () -> Unit) {
+    val state = remember { MutableTransitionState(!Motion.enabled).apply { targetState = true } }
+    AnimatedVisibility(visibleState = state, enter = Motion.settleIn(), exit = Motion.settleOut()) { content() }
 }

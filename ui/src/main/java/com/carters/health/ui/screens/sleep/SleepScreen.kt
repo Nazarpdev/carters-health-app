@@ -1,10 +1,6 @@
 package com.carters.health.ui.screens.sleep
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -57,7 +53,10 @@ import com.carters.health.data.model.SleepNight
 import com.carters.health.data.model.SleepStage
 import com.carters.health.data.repo.HealthRepository
 import com.carters.health.data.repo.InMemoryHealthRepository
+import com.carters.health.ui.components.AnimatedNumber
 import com.carters.health.ui.components.DistributionBar
+import com.carters.health.ui.components.Motion
+import com.carters.health.ui.components.pressableClick
 import com.carters.health.ui.components.Eyebrow
 import com.carters.health.ui.components.SoftCard
 import com.carters.health.ui.components.Pill
@@ -104,7 +103,11 @@ fun SleepScreen(repository: HealthRepository, modifier: Modifier = Modifier) {
             item {
                 AnimatedContent(
                     targetState = night,
-                    transitionSpec = { (fadeIn() + slideInHorizontally { it / 8 }) togetherWith (fadeOut() + slideOutHorizontally { -it / 8 }) },
+                    transitionSpec = {
+                        // Older nights live to the left, newer to the right: slide the way the chevron pointed.
+                        val goingBack = targetState.date.isBefore(initialState.date)
+                        Motion.slideIn(forward = !goingBack) togetherWith Motion.slideOut(forward = !goingBack)
+                    },
                     label = "night",
                 ) { n ->
                     Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
@@ -141,7 +144,7 @@ private fun NavChevron(icon: androidx.compose.ui.graphics.vector.ImageVector, en
             .size(40.dp)
             .clip(CircleShape)
             .background(if (enabled) HealthColors.LavenderSoft else HealthColors.CardAlt)
-            .clickable(enabled = enabled, onClick = onClick),
+            .pressableClick(enabled = enabled, pressed = 0.9f, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Icon(icon, contentDescription = null, tint = if (enabled) HealthColors.LavenderDeep else HealthColors.Faint)
@@ -155,7 +158,7 @@ private fun SleepScoreCard(night: SleepNight) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadialGauge(progress = night.score / 100f, modifier = Modifier.size(150.dp), colors = listOf(HealthColors.Lavender), strokeWidth = 12.dp) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("${night.score}", style = MaterialTheme.typography.displaySmall, color = HealthColors.Ink, fontWeight = FontWeight.Bold)
+                    AnimatedNumber(night.score, style = MaterialTheme.typography.displaySmall)
                     Eyebrow("Sleep score", HealthColors.Lavender)
                 }
             }

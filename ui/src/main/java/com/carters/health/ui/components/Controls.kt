@@ -70,7 +70,7 @@ fun SegmentedControl(
             .padding(3.dp),
     ) {
         val segment = maxWidth / options.size
-        val offset by animateFloatAsState(selected.toFloat(), Motion.snappySpring, label = "thumb")
+        val offset by animateFloatAsState(selected.toFloat(), Motion.snappy(), label = "thumb")
         Box(
             Modifier
                 .offset(x = segment * offset)
@@ -81,7 +81,7 @@ fun SegmentedControl(
         )
         Row(Modifier.fillMaxWidth().fillMaxHeight()) {
             options.forEachIndexed { i, label ->
-                val color by animateColorAsState(if (i == selected) accent else HealthColors.Muted, label = "seg")
+                val color by animateColorAsState(if (i == selected) accent else HealthColors.Muted, Motion.quick(), label = "seg")
                 Box(
                     Modifier
                         .weight(1f)

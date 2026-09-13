@@ -14,6 +14,7 @@ enum class HealthTab(val label: String) {
 /** Detail destinations pushed on top of a tab. */
 sealed interface HealthRoute {
     data object WeightTrend : HealthRoute
+    data object Settings : HealthRoute
 }
 
 /**

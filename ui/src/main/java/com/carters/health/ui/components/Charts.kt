@@ -139,12 +139,13 @@ fun ScrubbableLineChart(
     gridLines: Int = 3,
     strokeWidth: Dp = 2.5.dp,
     onScrub: ((index: Int?) -> Unit)? = null,
+    revealKey: Any? = null,
 ) {
     val measurer = rememberTextMeasurer()
     val haptics = LocalHapticFeedback.current
     var scrubX by remember { mutableStateOf<Float?>(null) }
     var lastIndex by remember { mutableStateOf(-1) }
-    val reveal by rememberRevealedProgress(1f, "chartReveal")
+    val reveal by androidx.compose.runtime.key(revealKey) { rememberRevealedProgress(1f, "chartReveal") }
     val labelStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Faint, fontSize = 10.sp, fontWeight = FontWeight.Medium)
     val readoutStyle = TextStyle(fontFamily = SansFamily, color = HealthColors.Card, fontSize = 13.sp, fontWeight = FontWeight.Bold)
     val readoutSub = TextStyle(fontFamily = SansFamily, color = HealthColors.CardAlt, fontSize = 10.sp, fontWeight = FontWeight.Medium)

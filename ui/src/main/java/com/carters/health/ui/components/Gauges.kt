@@ -202,7 +202,7 @@ fun CountdownRing(
             val stroke = strokeWidth.toPx()
             val radius = size.minDimension / 2 - stroke * 1.5f
             val c = Offset(size.width / 2, size.height / 2)
-            val alpha = if (running) 0.7f + 0.3f * pulse else 0.6f
+            val alpha = if (running && Motion.enabled) 0.7f + 0.3f * pulse else if (running) 1f else 0.6f
             drawCircle(HealthColors.Card, radius, c, style = Stroke(stroke))
             val sweep = 360f * fraction.coerceIn(0f, 1f)
             drawArc(
@@ -227,7 +227,7 @@ fun PulsingDot(color: Color = HealthColors.Green, size: Dp = 10.dp, modifier: Mo
     Canvas(modifier.size(size * 2.6f)) {
         val c = Offset(this.size.width / 2, this.size.height / 2)
         val r = size.toPx() / 2
-        drawCircle(color.copy(alpha = (1f - ripple) * 0.5f), radius = r + r * 1.6f * ripple, center = c)
+        if (Motion.enabled) drawCircle(color.copy(alpha = (1f - ripple) * 0.5f), radius = r + r * 1.6f * ripple, center = c)
         drawCircle(color, radius = r, center = c)
     }
 }
@@ -254,7 +254,7 @@ fun BeatingHeart(bpm: Int, modifier: Modifier = Modifier, color: Color = HealthC
     Canvas(modifier.size(size)) {
         val w = this.size.width
         val h = this.size.height
-        val s = scale
+        val s = if (Motion.enabled) scale else 1f
         val path = androidx.compose.ui.graphics.Path().apply {
             moveTo(w / 2, h * 0.9f)
             cubicTo(w * 0.05f, h * 0.55f, w * 0.05f, h * 0.05f, w * 0.5f, h * 0.3f)

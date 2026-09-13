@@ -62,6 +62,8 @@ import com.carters.health.ui.components.ChartSeries
 import com.carters.health.ui.components.DeltaBadge
 import com.carters.health.ui.components.Eyebrow
 import com.carters.health.ui.components.SoftCard
+import com.carters.health.ui.components.Staggered
+import com.carters.health.ui.screens.workout.SettleIn
 import com.carters.health.ui.components.PrimaryButton
 import com.carters.health.ui.components.NumberField
 import com.carters.health.ui.components.Pill
@@ -70,6 +72,7 @@ import com.carters.health.ui.components.ScrubbableLineChart
 import com.carters.health.ui.components.SectionHeader
 import com.carters.health.ui.components.SegmentedControl
 import com.carters.health.ui.components.UnitToggle
+import com.carters.health.ui.settings.LocalAppSettings
 import com.carters.health.ui.theme.HealthColors
 import com.carters.health.ui.theme.HealthTheme
 import com.carters.health.ui.theme.LocalHealthHaptics
@@ -86,7 +89,8 @@ fun WeightTrendScreen(
     modifier: Modifier = Modifier,
 ) {
     val history by repository.weightHistory.collectAsState()
-    var unit by rememberSaveable { mutableStateOf(WeightUnit.LBS) }
+    val settings = LocalAppSettings.current
+    val unit = settings.unit
     var timeframe by rememberSaveable { mutableStateOf(Timeframe.D30) }
     var showLog by remember { mutableStateOf(false) }
     var scanning by remember { mutableStateOf(false) }
@@ -120,11 +124,11 @@ fun WeightTrendScreen(
                 )
                 Spacer(Modifier.width(6.dp))
                 Text("Weight & body", style = MaterialTheme.typography.headlineMedium, color = HealthColors.Ink, modifier = Modifier.weight(1f))
-                UnitToggle(unit, { unit = it }, accent = HealthColors.Sky)
+                UnitToggle(unit, { settings.updateUnit(it) }, accent = HealthColors.Sky)
             }
         }
         item {
-            HeroWeightCard(latest, unit, latest?.weightLbs?.minus(baseline30) ?: 0.0, timeFmt)
+            Staggered(0) { HeroWeightCard(latest, unit, latest?.weightLbs?.minus(baseline30) ?: 0.0, timeFmt) }
         }
         item {
             SoftCard(accent = HealthColors.Green, contentPadding = PaddingValues(16.dp)) {
@@ -145,6 +149,7 @@ fun WeightTrendScreen(
                     xLabelCount = if (timeframe == Timeframe.D7) window.size.coerceIn(2, 7) else 4,
                     formatValue = { String.format("%.1f", it) },
                     scrubLabel = { i -> window.getOrNull(i)?.let { "${it.time.format(DateTimeFormatter.ofPattern("MMM d, h:mm a"))} · ${it.source.label}" } ?: "" },
+                    revealKey = timeframe,
                 )
             }
         }
@@ -320,6 +325,7 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
     var weight by remember { mutableStateOf("") }
     var fat by remember { mutableStateOf("") }
     Dialog(onDismissRequest = onDismiss) {
+        SettleIn {
         SoftCard(accent = HealthColors.Sky, contentPadding = PaddingValues(20.dp)) {
             Text("Manual weigh-in", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             Text(LocalDateTime.now().format(DateTimeFormatter.ofPattern("EEEE, MMM d · h:mm a")), style = MaterialTheme.typography.bodySmall, color = HealthColors.Muted)
@@ -345,6 +351,7 @@ private fun LogWeightDialog(unit: WeightUnit, onDismiss: () -> Unit, onSave: (lb
                     onSave(Units.toLbs(w, unit), fat.toDoubleOrNull())
                 }
             }
+        }
         }
     }
 }

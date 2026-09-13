@@ -23,7 +23,9 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,7 +60,7 @@ fun SoftCard(
             .fillMaxWidth()
             .clip(shape)
             .background(if (tinted) HealthColors.tint(accent) else container)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.pressableClick(pressed = 0.985f, onClick = onClick) else Modifier)
             .padding(contentPadding),
         content = content,
     )
@@ -107,13 +109,13 @@ fun Pill(
     icon: ImageVector? = null,
     onClick: (() -> Unit)? = null,
 ) {
-    val bg = if (filled) color else HealthColors.tint(color)
-    val fg = if (filled) HealthColors.Card else if (color == HealthColors.Muted || color == HealthColors.Faint) HealthColors.InkSoft else color
+    val bg by animateColorAsState(if (filled) color else HealthColors.tint(color), Motion.quick(), label = "pillBg")
+    val fg by animateColorAsState(if (filled) HealthColors.Card else if (color == HealthColors.Muted || color == HealthColors.Faint) HealthColors.InkSoft else color, Motion.quick(), label = "pillFg")
     Row(
         modifier = modifier
             .clip(CircleShape)
             .background(bg)
-            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
+            .then(if (onClick != null) Modifier.pressableClick(pressed = 0.94f, onClick = onClick) else Modifier)
             .padding(horizontal = 10.dp, vertical = 5.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -164,7 +166,7 @@ fun PrimaryButton(
             .height(height)
             .clip(shape)
             .background(color)
-            .clickable(onClick = onClick),
+            .pressableClick(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -190,7 +192,7 @@ fun TonalButton(
             .height(height)
             .clip(shape)
             .background(HealthColors.tint(color))
-            .clickable(onClick = onClick),
+            .pressableClick(onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {

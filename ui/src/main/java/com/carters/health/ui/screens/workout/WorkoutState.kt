@@ -150,6 +150,7 @@ class WorkoutSessionState(session: WorkoutSession) {
     var name by mutableStateOf(session.name)
     val startedAt: LocalDateTime = session.startedAt
     var unit by mutableStateOf(WeightUnit.LBS)
+    var autoStartRest by mutableStateOf(true)
     val restTimer = RestTimerState()
     val exercises: SnapshotStateList<ExerciseState> = mutableStateListOf()
     var lastCompletedExerciseName by mutableStateOf<String?>(null)
@@ -180,7 +181,7 @@ class WorkoutSessionState(session: WorkoutSession) {
         set.adoptPreviousIfEmpty()
         set.completed = true
         lastCompletedExerciseName = exercise.exercise.name
-        restTimer.start(exercise.exercise.defaultRestSeconds)
+        if (autoStartRest) restTimer.start(exercise.exercise.defaultRestSeconds)
     }
 
     fun addSet(exercise: ExerciseState) = exercise.addSet(nextId++)

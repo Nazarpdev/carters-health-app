@@ -38,6 +38,8 @@ they will implement `HealthRepository` so no screen changes when real telemetry 
   BLE radar scanner, manual log dialog, weigh-in history.
 - **Sleep** (`SleepScreen`) — sleep score gauge, debt, bedtime / wake pills, stage-stepped hypnogram
   from consolidated multi-record nights, stage distribution, date navigation and history.
+- **Settings** (`SettingsScreen`) — theme (system / light / dark), animations toggle, haptics, weight unit,
+  daily step goal, auto rest timer. Persisted through `SettingsStore` (SharedPreferences in `:app`).
 - **Trends** (`TrendsScreen`) — scrubbable 24 h heart-rate timeline with live readout, RHR / HRV
   baselines, SpO₂ range strip and zones, stress index strip and zone breakdown.
 
@@ -47,6 +49,14 @@ they will implement `HealthRepository` so no screen changes when real telemetry 
 `BeatingHeart`, `Sparkline`, `ScrubbableLineChart` (Catmull-Rom → cubic Bézier, drag scrubbing with
 haptic ticks), `DistributionBar`, `BarStrip`, `SegmentedControl`, `UnitToggle`, `NumberField`,
 `StatTile`, `Pill`, `DeltaBadge`, `PrimaryButton`, `TonalButton`.
+
+## Motion
+
+All animation goes through `Motion` so the Animations setting can switch the app to instant.
+Transitions are named for the action: tabs slide in the direction of travel, detail pages push in
+from the right while the parent settles back, added sets and exercises grow into place, dialogs
+settle in, banners drop from the top, the tab-bar thumb glides, buttons squeeze on press, hero
+numbers count up, charts redraw when the timeframe changes.
 
 ## Building
 

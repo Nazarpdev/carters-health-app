@@ -100,6 +100,7 @@ private fun CreateExerciseDialog(onDismiss: () -> Unit, onCreate: (Exercise) -> 
     var restIndex by remember { mutableStateOf(2) }
 
     Dialog(onDismissRequest = onDismiss) {
+        SettleIn {
         SoftCard(accent = HealthColors.Lavender, contentPadding = PaddingValues(20.dp)) {
             Text("Custom exercise", style = MaterialTheme.typography.headlineSmall, color = HealthColors.Ink)
             Spacer(Modifier.height(14.dp))
@@ -140,6 +141,7 @@ private fun CreateExerciseDialog(onDismiss: () -> Unit, onCreate: (Exercise) -> 
                     if (name.isNotBlank()) onCreate(Exercise(0, name.trim(), group, equipment, restOptions[restIndex], isCustom = true))
                 }
             }
+        }
         }
     }
 }
